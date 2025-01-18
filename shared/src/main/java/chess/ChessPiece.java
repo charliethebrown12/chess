@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -17,6 +19,20 @@ public class ChessPiece {
         this.pieceType = type;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return getTeamColor() == that.getTeamColor() && getPieceType() == that.getPieceType();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getTeamColor(), getPieceType());
+    }
+
     /**
      * The various different chess piece options
      */
@@ -27,11 +43,6 @@ public class ChessPiece {
         KNIGHT,
         ROOK,
         PAWN
-    }
-
-    public enum TeamColor {
-        WHITE,
-        BLACK
     }
 
     /**
@@ -56,6 +67,41 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int column = myPosition.getColumn();
+        if (this.pieceType == PieceType.PAWN) {
+            if (this.teamColor == ChessGame.TeamColor.WHITE) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column), this.pieceType));
+            }
+            if (row == 2 && this.teamColor == ChessGame.TeamColor.WHITE) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row + 2, column), this.pieceType));
+            }
+            if (this.teamColor == ChessGame.TeamColor.BLACK) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column), this.pieceType));
+            }
+            if (row == 7 && this.teamColor == ChessGame.TeamColor.BLACK) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row - 2, column), this.pieceType));
+            }
+        }
+        if (this.pieceType == PieceType.ROOK) {
+            if (this.teamColor == ChessGame.TeamColor.WHITE) {
+                for (int i = 1; column + i <= 8; i++) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row, column + i), this.pieceType));
+                }
+                for (int i = 1; row + i <= 8; i++) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row + i, column), this.pieceType));
+                }
+            if (this.teamColor == ChessGame.TeamColor.BLACK) {
+                for (int i = 1; column - i >= 1; i++) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row, column - i), this.pieceType));
+                }
+                for (int i = 1; row - i >= 1; i++) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row - i, column), this.pieceType));
+                }
+            }
+            }
+        }
+        return moves;
     }
 }
