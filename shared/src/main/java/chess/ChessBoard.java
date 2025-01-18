@@ -1,5 +1,7 @@
 package chess;
 
+import static chess.ChessPiece.PieceType.*;
+import static chess.ChessGame.TeamColor.*;
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -7,9 +9,10 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessBoard {
+    private final ChessPiece[][] board;
 
     public ChessBoard() {
-        
+        this.board = new ChessPiece[7][7];
     }
 
     /**
@@ -19,7 +22,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
+        board[position.getRow()][position.getColumn()] = piece;
     }
 
     /**
@@ -30,7 +33,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        return board[position.getRow()][position.getColumn()];
     }
 
     /**
@@ -38,6 +41,41 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        //White Team initial positions
+        addPiece(new ChessPosition(0, 0), new ChessPiece(WHITE, ROOK));
+        addPiece(new ChessPosition(1, 0), new ChessPiece(WHITE, KNIGHT));
+        addPiece(new ChessPosition(2, 0), new ChessPiece(WHITE, BISHOP));
+        addPiece(new ChessPosition(3, 0), new ChessPiece(WHITE, QUEEN));
+        addPiece(new ChessPosition(4, 0), new ChessPiece(WHITE, KING));
+        addPiece(new ChessPosition(5, 0), new ChessPiece(WHITE, BISHOP));
+        addPiece(new ChessPosition(6, 0), new ChessPiece(WHITE, KNIGHT));
+        addPiece(new ChessPosition(7, 0), new ChessPiece(WHITE, ROOK));
+        addPiece(new ChessPosition(0, 1), new ChessPiece(WHITE, PAWN));
+        addPiece(new ChessPosition(1, 1), new ChessPiece(WHITE, PAWN));
+        addPiece(new ChessPosition(2, 1), new ChessPiece(WHITE, PAWN));
+        addPiece(new ChessPosition(3, 1), new ChessPiece(WHITE, PAWN));
+        addPiece(new ChessPosition(4, 1), new ChessPiece(WHITE, PAWN));
+        addPiece(new ChessPosition(5, 1), new ChessPiece(WHITE, PAWN));
+        addPiece(new ChessPosition(6, 1), new ChessPiece(WHITE, PAWN));
+        addPiece(new ChessPosition(7, 1), new ChessPiece(WHITE, PAWN));
+        //Black Team initial positions
+        addPiece(new ChessPosition(0, 7), new ChessPiece(BLACK, ROOK));
+        addPiece(new ChessPosition(1, 7), new ChessPiece(BLACK, KNIGHT));
+        addPiece(new ChessPosition(2, 7), new ChessPiece(BLACK, BISHOP));
+        addPiece(new ChessPosition(3, 7), new ChessPiece(BLACK, QUEEN));
+        addPiece(new ChessPosition(4, 7), new ChessPiece(BLACK, KING));
+        addPiece(new ChessPosition(5, 7), new ChessPiece(BLACK, BISHOP));
+        addPiece(new ChessPosition(6, 7), new ChessPiece(BLACK, KNIGHT));
+        addPiece(new ChessPosition(7, 7), new ChessPiece(BLACK, ROOK));
+        addPiece(new ChessPosition(0, 6), new ChessPiece(BLACK, PAWN));
+        addPiece(new ChessPosition(1, 6), new ChessPiece(BLACK, PAWN));
+        addPiece(new ChessPosition(2, 6), new ChessPiece(BLACK, PAWN));
+        addPiece(new ChessPosition(3, 6), new ChessPiece(BLACK, PAWN));
+        addPiece(new ChessPosition(4, 6), new ChessPiece(BLACK, PAWN));
+        addPiece(new ChessPosition(5, 6), new ChessPiece(BLACK, PAWN));
+        addPiece(new ChessPosition(6, 6), new ChessPiece(BLACK, PAWN));
+        addPiece(new ChessPosition(7, 6), new ChessPiece(BLACK, PAWN));
+
+
     }
 }

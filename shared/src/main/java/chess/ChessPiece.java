@@ -9,8 +9,8 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private PieceType pieceType;
     private final ChessGame.TeamColor teamColor;
+    private PieceType pieceType;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.teamColor = pieceColor;
@@ -27,6 +27,11 @@ public class ChessPiece {
         KNIGHT,
         ROOK,
         PAWN
+    }
+
+    public enum TeamColor {
+        WHITE,
+        BLACK
     }
 
     /**
