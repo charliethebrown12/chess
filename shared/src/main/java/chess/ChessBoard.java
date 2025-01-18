@@ -12,7 +12,7 @@ public class ChessBoard {
     private final ChessPiece[][] board;
 
     public ChessBoard() {
-        this.board = new ChessPiece[7][7];
+        this.board = new ChessPiece[8][8];
     }
 
     /**
