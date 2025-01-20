@@ -65,5 +65,6 @@ public class ChessMove {
      */
     public ChessPiece.PieceType getPromotionPiece() {
         return null;
+        //work on next
     }
 }
