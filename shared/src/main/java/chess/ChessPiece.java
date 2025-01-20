@@ -85,22 +85,66 @@ public class ChessPiece {
             }
         }
         if (this.pieceType == PieceType.ROOK) {
-            if (this.teamColor == ChessGame.TeamColor.WHITE) {
-                for (int i = 1; column + i <= 8; i++) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(row, column + i), this.pieceType));
-                }
-                for (int i = 1; row + i <= 8; i++) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(row + i, column), this.pieceType));
-                }
-            if (this.teamColor == ChessGame.TeamColor.BLACK) {
-                for (int i = 1; column - i >= 1; i++) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(row, column - i), this.pieceType));
-                }
-                for (int i = 1; row - i >= 1; i++) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(row - i, column), this.pieceType));
-                }
+            for (int i = 1; column + i <= 8; i++) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row, column + i), this.pieceType));
             }
+            for (int i = 1; row + i <= 8; i++) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row + i, column), this.pieceType));
             }
+            for (int i = 1; column - i >= 1; i++) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row, column - i), this.pieceType));
+            }
+            for (int i = 1; row - i >= 1; i++) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row - i, column), this.pieceType));
+            }
+        }
+        if (this.pieceType == PieceType.BISHOP) {
+            for (int i = 1; column + i <= 8; i++) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row + i, column + i), this.pieceType));
+                moves.add(new ChessMove(myPosition, new ChessPosition(row - i, column + i), this.pieceType));
+            }
+            for (int i = 1; column - i >= 1; i++) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row - i, column - i), this.pieceType));
+                moves.add(new ChessMove(myPosition, new ChessPosition(row + i, column - i), this.pieceType));
+            }
+        }
+        if (this.pieceType == PieceType.QUEEN) {
+            for (int i = 1; column + i <= 8; i++) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row + i, column + i), this.pieceType));
+                moves.add(new ChessMove(myPosition, new ChessPosition(row - i, column + i), this.pieceType));
+                moves.add(new ChessMove(myPosition, new ChessPosition(row, column + i), this.pieceType));
+            }
+            for (int i = 1; column - i >= 1; i++) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row - i, column - i), this.pieceType));
+                moves.add(new ChessMove(myPosition, new ChessPosition(row + i, column - i), this.pieceType));
+                moves.add(new ChessMove(myPosition, new ChessPosition(row, column - i), this.pieceType));
+            }
+            for (int i = 1; row + i <= 8; i++) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row + i, column), this.pieceType));
+            }
+            for (int i = 1; row - i >= 1; i++) {
+                moves.add(new ChessMove(myPosition, new ChessPosition(row - i, column), this.pieceType));
+            }
+        }
+        if (this.pieceType == PieceType.KING) {
+            moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column - 1), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column + 1), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row, column - 1), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row, column + 1), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column + 1), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column - 1), this.pieceType));
+        }
+        if (this.pieceType == PieceType.KNIGHT) {
+            moves.add(new ChessMove(myPosition, new ChessPosition(row + 2, column + 1), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row + 2, column - 1), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column + 2), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column + 2), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row - 2, column + 1), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row - 2, column - 1), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column - 2), this.pieceType));
+            moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column - 2), this.pieceType));
         }
         return moves;
     }
