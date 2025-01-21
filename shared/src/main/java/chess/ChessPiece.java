@@ -76,7 +76,16 @@ public class ChessPiece {
                     ChessPosition position1 = new ChessPosition(row + 1, column);
                     ChessPiece pieceThere1 = board.getPiece(position1);
                     if (pieceThere1 == null) {
-                        moves.add(new ChessMove(myPosition, position1, ChessMove.getPromotionPiece(this.pieceType)));
+                        if (row + 1 == 8) {
+                            for (PieceType promotion : PieceType.values()) {
+                                if (promotion != PieceType.PAWN && promotion != PieceType.KING) {
+                                    moves.add(new ChessMove(myPosition, position1, promotion));
+                                }
+                            }
+                        }
+                        else {
+                            moves.add(new ChessMove(myPosition, position1, null));
+                        }
                     }
                 }
                 if (row == 2) {
@@ -92,14 +101,32 @@ public class ChessPiece {
                     ChessPosition position1 = new ChessPosition(row + 1, column + 1);
                     ChessPiece pieceThere1 = board.getPiece(position1);
                     if (pieceThere1 != null && pieceThere1.teamColor != this.teamColor) {
-                        moves.add(new ChessMove(myPosition, position1, this.pieceType));
+                        if (row + 1 == 8) {
+                            for (PieceType promotion : PieceType.values()) {
+                                if (promotion != PieceType.PAWN && promotion != PieceType.KING) {
+                                    moves.add(new ChessMove(myPosition, position1, promotion));
+                                }
+                            }
+                        }
+                        else {
+                            moves.add(new ChessMove(myPosition, position1, null));
+                        }
                     }
                 }
                 if (row + 1 <= 8 && column - 1 >= 1) {
                     ChessPosition position1 = new ChessPosition(row + 1, column - 1);
                     ChessPiece pieceThere1 = board.getPiece(position1);
                     if (pieceThere1 != null && pieceThere1.teamColor != this.teamColor) {
-                        moves.add(new ChessMove(myPosition, position1, this.pieceType));
+                        if (row + 1 == 8) {
+                            for (PieceType promotion : PieceType.values()) {
+                                if (promotion != PieceType.PAWN && promotion != PieceType.KING) {
+                                    moves.add(new ChessMove(myPosition, position1, promotion));
+                                }
+                            }
+                        }
+                        else {
+                            moves.add(new ChessMove(myPosition, position1, null));
+                        }
                     }
                 }
             }
@@ -108,7 +135,16 @@ public class ChessPiece {
                     ChessPosition position1 = new ChessPosition(row - 1, column);
                     ChessPiece pieceThere1 = board.getPiece(position1);
                     if (pieceThere1 == null) {
-                        moves.add(new ChessMove(myPosition, position1, this.pieceType));
+                        if (row - 1 == 1) {
+                            for (PieceType promotion : PieceType.values()) {
+                                if (promotion != PieceType.PAWN && promotion != PieceType.KING) {
+                                    moves.add(new ChessMove(myPosition, position1, promotion));
+                                }
+                            }
+                        }
+                        else {
+                            moves.add(new ChessMove(myPosition, position1, null));
+                        }
                     }
                 }
                 if (row == 7) {
@@ -124,14 +160,32 @@ public class ChessPiece {
                     ChessPosition position1 = new ChessPosition(row - 1, column - 1);
                     ChessPiece pieceThere1 = board.getPiece(position1);
                     if (pieceThere1 != null && pieceThere1.teamColor != this.teamColor) {
-                        moves.add(new ChessMove(myPosition, position1, this.pieceType));
+                        if (row - 1 == 1) {
+                            for (PieceType promotion : PieceType.values()) {
+                                if (promotion != PieceType.PAWN && promotion != PieceType.KING) {
+                                    moves.add(new ChessMove(myPosition, position1, promotion));
+                                }
+                            }
+                        }
+                        else {
+                            moves.add(new ChessMove(myPosition, position1, null));
+                        }
                     }
                 }
                 if (row - 1 >= 1 && column + 1 <= 8) {
                     ChessPosition position1 = new ChessPosition(row - 1, column + 1);
                     ChessPiece pieceThere1 = board.getPiece(position1);
                     if (pieceThere1 != null && pieceThere1.teamColor != this.teamColor) {
-                        moves.add(new ChessMove(myPosition, position1, this.pieceType));
+                        if (row - 1 == 1) {
+                            for (PieceType promotion : PieceType.values()) {
+                                if (promotion != PieceType.PAWN && promotion != PieceType.KING) {
+                                    moves.add(new ChessMove(myPosition, position1, promotion));
+                                }
+                            }
+                        }
+                        else {
+                            moves.add(new ChessMove(myPosition, position1, null));
+                        }
                     }
                 }
             }
