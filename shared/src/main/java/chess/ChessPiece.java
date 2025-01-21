@@ -94,7 +94,7 @@ public class ChessPiece {
                     ChessPosition position2 = new ChessPosition(row + 1, column);
                     ChessPiece pieceThere2 = board.getPiece(position2);
                     if (pieceThere1 == null && pieceThere2 == null) {
-                        moves.add(new ChessMove(myPosition, position1, this.pieceType));
+                        moves.add(new ChessMove(myPosition, position1, null));
                     }
                 }
                 if (row + 1 <= 8 && column + 1 <= 8) {
@@ -153,7 +153,7 @@ public class ChessPiece {
                     ChessPosition position2 = new ChessPosition(row - 1, column);
                     ChessPiece pieceThere2 = board.getPiece(position2);
                     if (pieceThere1 == null && pieceThere2 == null) {
-                        moves.add(new ChessMove(myPosition, position1, this.pieceType));
+                        moves.add(new ChessMove(myPosition, position1, null));
                     }
                 }
                 if (row - 1 >= 1 && column - 1 >= 1) {
