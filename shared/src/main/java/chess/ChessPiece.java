@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class ChessPiece {
     private final ChessGame.TeamColor teamColor;
-    private PieceType pieceType;
+    private final PieceType pieceType;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.teamColor = pieceColor;
@@ -31,6 +31,14 @@ public class ChessPiece {
     @Override
     public int hashCode() {
         return Objects.hash(getTeamColor(), getPieceType());
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "teamColor=" + teamColor +
+                ", pieceType=" + pieceType +
+                '}';
     }
 
     /**
