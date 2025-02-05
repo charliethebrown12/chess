@@ -182,13 +182,17 @@ public class ChessGame {
         return board;
     }
 /*
+    loop over every spot on the board and find the king of the color that was put into the function and return the position of the king
     private ChessPosition findKing(TeamColor teamColor) {
         return null;
     }
 
-    private Collection<ChessPiece> getPiecesByColor(TeamColor color) {
-        return null;
-    }
+    
+    find all moves of a particular teams color
+    Use this to identify if any of the enemy moves are the same as the position of the king
+    If yes, then return isInCheck as True
+    If isInCheck is True check if any moves are available and if not, the isInCheckmate is True
+    If isInCheck is False but no moves are available then isInStalemate is True
 
     private Collection<ChessMove> getEnemyMoves(TeamColor teamColor) {
         Collection<ChessPiece> opponentPieces = getPiecesByColor(teamColor);
