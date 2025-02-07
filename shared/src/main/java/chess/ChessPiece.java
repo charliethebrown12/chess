@@ -41,6 +41,8 @@ public class ChessPiece {
                 '}';
     }
 
+    //copy method to help in the creation of the board copy method that creates a copy of a ChessPiece object
+
     public ChessPiece copy() {
         return new ChessPiece(teamColor, pieceType);
     }
