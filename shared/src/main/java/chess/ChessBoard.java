@@ -39,6 +39,8 @@ public class ChessBoard {
                 '}';
     }
 
+    // added a copy method for creating a copy of the current ChessBoard object
+
     public ChessBoard copy() {
         ChessBoard copy = new ChessBoard();
         for (int i = 1; i <= 8; i++) {
