@@ -235,6 +235,8 @@ public class ChessGame {
         return board;
     }
 
+    // finds and returns the position of the king for isInCheck functionality
+
     private ChessPosition findKingPosition(TeamColor teamColor) {
         for (int row = 1; row <= 8; row ++) {
             for (int column = 1; column <= 8; column++) {
