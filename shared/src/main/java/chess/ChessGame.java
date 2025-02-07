@@ -21,6 +21,9 @@ public class ChessGame {
         board.resetBoard();
     }
 
+    //added a secondary constructor to allow the isInCheck method to
+    //call the copy of the board without changing the signature of isInCheck
+
     public ChessGame(ChessGame other) {
         this.teamTurn = other.teamTurn;
         this.board = other.board.copy();
