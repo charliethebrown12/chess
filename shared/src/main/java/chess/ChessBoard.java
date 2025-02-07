@@ -117,6 +117,8 @@ public class ChessBoard {
 
     }
 
+    // method that actually makes the move inside the ChessBoard class to allow adding and removing pieces easily
+
     public void makeMove(ChessMove move) {
         ChessPiece piece = getPiece(move.getStartPosition());
         if (piece == null) {
