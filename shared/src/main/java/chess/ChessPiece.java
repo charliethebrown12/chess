@@ -41,6 +41,10 @@ public class ChessPiece {
                 '}';
     }
 
+    public ChessPiece copy() {
+        return new ChessPiece(teamColor, pieceType);
+    }
+
     /**
      * The various different chess piece options
      */
@@ -528,7 +532,6 @@ public class ChessPiece {
                 }
             }
         }
-        System.out.println(moves);
         return moves;
     }
 }

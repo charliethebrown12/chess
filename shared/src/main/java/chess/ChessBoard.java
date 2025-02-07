@@ -39,6 +39,20 @@ public class ChessBoard {
                 '}';
     }
 
+    public ChessBoard copy() {
+        ChessBoard copy = new ChessBoard();
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = this.getPiece(position);
+                if (piece != null) {
+                    copy.addPiece(position, piece.copy());
+                }
+            }
+        }
+        return copy;
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
@@ -101,5 +115,19 @@ public class ChessBoard {
         addPiece(new ChessPosition(7, 8), new ChessPiece(BLACK, PAWN));
 
 
+    }
+
+    public void makeMove(ChessMove move) {
+        ChessPiece piece = getPiece(move.getStartPosition());
+        if (piece == null) {
+            return;
+        }
+
+        addPiece(move.getEndPosition(), piece);
+        addPiece(move.getStartPosition(), null);
+
+        if (move.getPromotionPiece() != null) {
+            addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
+        }
     }
 }
