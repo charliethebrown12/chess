@@ -14,12 +14,16 @@ public class UserMemoryDataAccess implements UserAccess {
 
     public UserData getUser(String username) throws DataAccessException {
         try {
-            if (users.contains(userData)) return userData;
+            for (UserData user : users) {
+                if (user.username().equals(username)) {
+                    return user;
+                }
+            }
+            return null;
         }
         catch (Exception e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("Error retrieving user: " + e.getMessage());
     }
-        return null;
     }
 
     public UserData createUser(String username, String password, String email) throws DataAccessException {
