@@ -15,6 +15,10 @@ public class Server {
             return "Auth token for user " + username + " nothing yet";
         });
 
+        RegisterHandler registerHandler = new RegisterHandler();
+
+        Spark.post("/user", registerHandler::register);
+
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
 

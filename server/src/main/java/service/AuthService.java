@@ -1,12 +1,20 @@
 package service;
 
+import dataAccess.AuthAccess;
+import dataAccess.DataAccessException;
+import dataAccess.UserAccess;
 import model.AuthData;
 
 import java.util.UUID;
 
 public class AuthService {
-    public static AuthData createAuth(String username) {
+    private static AuthAccess authAccess;
+
+    public AuthService(AuthAccess authAccess) {
+        this.authAccess = authAccess;
+    }
+    public AuthData createAuth(String username) throws DataAccessException {
         UUID uuid = UUID.randomUUID();
-        return new AuthData(uuid.toString(), username);
+        return authAccess.createAuth(uuid.toString(), username);
     }
 }

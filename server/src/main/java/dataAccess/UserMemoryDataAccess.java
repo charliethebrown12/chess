@@ -33,6 +33,7 @@ public class UserMemoryDataAccess implements UserAccess {
             }
             UserData newUser = new UserData(username, password, email);
             users.add(newUser);
+            System.out.println(users);
             return newUser;
         }
         catch (Exception e) {
