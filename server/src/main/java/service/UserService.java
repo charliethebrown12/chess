@@ -8,7 +8,7 @@ public class UserService {
     private static UserAccess userAccess;
 
     public UserService(UserAccess userAccess) {
-        this.userAccess = userAccess;
+        UserService.userAccess = userAccess;
     }
 
     public UserData createUser(String username, String password, String email) throws DataAccessException {

@@ -11,11 +11,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
     private UserService userService;
-    private UserMemoryDataAccess userDAO;
 
     @BeforeEach
     void setUp() {
-        userDAO = new UserMemoryDataAccess(new ArrayList<>());
+        UserMemoryDataAccess userDAO = new UserMemoryDataAccess(new ArrayList<>());
         userService = new UserService(userDAO);
     }
 

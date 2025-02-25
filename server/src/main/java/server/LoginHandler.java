@@ -2,7 +2,6 @@ package server;
 
 import com.google.gson.Gson;
 import dataAccess.AuthMemoryDataAccess;
-import dataAccess.DataAccessException;
 import dataAccess.UserMemoryDataAccess;
 import model.AuthData;
 import model.UserData;
@@ -17,7 +16,7 @@ public class LoginHandler {
     private final UserService userService = new UserService(new UserMemoryDataAccess(new ArrayList<>()));
     private final AuthService authService = new AuthService(new AuthMemoryDataAccess(new ArrayList<>()));
 
-    Object login(Request req, Response res) throws DataAccessException {
+    Object login(Request req, Response res) {
         var newUser = new Gson().fromJson(req.body(), UserData.class);
         var newAuth = new Gson().fromJson(req.body(), AuthData.class);
 
