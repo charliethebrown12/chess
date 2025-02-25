@@ -26,4 +26,11 @@ public class UserService {
         }
         return userAccess.createUser(username, password, email);
     }
+
+    public UserData getUser(String username) throws DataAccessException {
+        if (username == null || username.isEmpty()) {
+            throw new DataAccessException("Username cannot be empty");
+        }
+        return userAccess.getUser(username);
+    }
 }

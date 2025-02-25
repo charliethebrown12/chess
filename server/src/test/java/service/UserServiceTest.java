@@ -38,4 +38,19 @@ class UserServiceTest {
         assertEquals("Error creating user: User already exists", exception.getMessage());
     }
 
+    @Test
+    void testGetUserSuccess() throws DataAccessException {
+        UserData user = userService.createUser("test", "password", "test@example.com");
+        assertNotNull(user, "User should not be null");
+        UserData user2 = userService.getUser("test");
+        assertNotNull(user2, "User should not be null");
+        assertEquals("test", user2.username(), "Username should match");
+    }
+
+    @Test
+    void testGetUserNotFound() {
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> userService.getUser("notausername"));
+        assertEquals("Error getting user: User not found", exception.getMessage());
+    }
+
 }

@@ -28,7 +28,7 @@ public class RegisterHandler {
 
         } catch (Exception e) {
             res.status(400);
-            return new Gson().toJson("User already exists");
+            return new Gson().toJson("Error registering user: " + e.getMessage());
         }
     }
 }

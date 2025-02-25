@@ -19,18 +19,15 @@ public class UserMemoryDataAccess implements UserAccess {
                     return user;
                 }
             }
-            return null;
+            throw new DataAccessException("User not found");
         }
         catch (Exception e) {
-            throw new DataAccessException("Error retrieving user: " + e.getMessage());
+            throw new DataAccessException("Error getting user: " + e.getMessage());
     }
     }
 
     public UserData createUser(String username, String password, String email) throws DataAccessException {
         try {
-            if (getUser(username) != null) {
-                throw new DataAccessException("User already exists");
-            }
             UserData newUser = new UserData(username, password, email);
             users.add(newUser);
             System.out.println(users);
