@@ -13,7 +13,11 @@ public class AuthService {
     public AuthService(AuthAccess authAccess) {
         this.authAccess = authAccess;
     }
+
     public AuthData createAuth(String username) throws DataAccessException {
+        if (username == null || username.isEmpty()) {
+            throw new DataAccessException("Username cannot be empty");
+        }
         UUID uuid = UUID.randomUUID();
         return authAccess.createAuth(uuid.toString(), username);
     }
