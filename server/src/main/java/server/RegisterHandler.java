@@ -9,12 +9,10 @@ import service.AuthService;
 import service.UserService;
 import spark.*;
 
-import java.util.ArrayList;
-
 
 public class RegisterHandler {
-    private final UserService userService = new UserService(new UserMemoryDataAccess(new ArrayList<>()));
-    private final AuthService authService = new AuthService(new AuthMemoryDataAccess(new ArrayList<>()));
+    private final UserService userService = new UserService(new UserMemoryDataAccess());
+    private final AuthService authService = new AuthService(new AuthMemoryDataAccess());
 
     Object register(Request req, Response res) {
         var newUser = new Gson().fromJson(req.body(), UserData.class);

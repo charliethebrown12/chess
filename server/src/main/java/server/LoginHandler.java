@@ -10,11 +10,9 @@ import service.UserService;
 import spark.Request;
 import spark.Response;
 
-import java.util.ArrayList;
-
 public class LoginHandler {
-    private final UserService userService = new UserService(new UserMemoryDataAccess(new ArrayList<>()));
-    private final AuthService authService = new AuthService(new AuthMemoryDataAccess(new ArrayList<>()));
+    private final UserService userService = new UserService(new UserMemoryDataAccess());
+    private final AuthService authService = new AuthService(new AuthMemoryDataAccess());
 
     Object login(Request req, Response res) {
         var newUser = new Gson().fromJson(req.body(), UserData.class);

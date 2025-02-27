@@ -14,7 +14,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        UserMemoryDataAccess userDAO = new UserMemoryDataAccess(new ArrayList<>());
+        UserMemoryDataAccess userDAO = new UserMemoryDataAccess();
         userService = new UserService(userDAO);
     }
 

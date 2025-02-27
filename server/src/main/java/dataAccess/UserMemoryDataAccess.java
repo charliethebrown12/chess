@@ -8,7 +8,7 @@ import java.util.List;
 public class UserMemoryDataAccess implements UserAccess {
     final List<UserData> users;
 
-    public UserMemoryDataAccess(List<UserData> users) {
+    public UserMemoryDataAccess() {
         this.users = new ArrayList<>();
     }
 

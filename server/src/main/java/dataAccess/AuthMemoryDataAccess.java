@@ -8,7 +8,7 @@ import java.util.List;
 public class AuthMemoryDataAccess  implements AuthAccess{
     final List<AuthData> auths;
 
-    public AuthMemoryDataAccess(List<AuthData> auths) {
+    public AuthMemoryDataAccess() {
         this.auths = new ArrayList<>();
     }
 

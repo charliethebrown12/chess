@@ -2,7 +2,6 @@ package service;
 
 import dataAccess.AuthAccess;
 import dataAccess.DataAccessException;
-import dataAccess.UserAccess;
 import model.AuthData;
 
 import java.util.UUID;
