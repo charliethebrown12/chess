@@ -1,7 +1,6 @@
 package dataAccess;
 
 import chess.ChessGame;
-import model.AuthData;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ public class GameMemoryDataAccess implements GameAccess {
             GameData newGame = new GameData(counter, null, null, gameName, new ChessGame());
             this.games.add(newGame);
             counter += 1;
+            System.out.println(games);
             return newGame.gameID();
         }
         catch (Exception e) {

@@ -24,7 +24,7 @@ public class CreateGameHandler {
                 throw new DataAccessException("User is not authorized to logout.");
             }
             int gameID = gameService.createGame(newGame.gameName());
-            return new Gson().toJson(gameID);
+            return new Gson().toJson("{ gameID: " + gameID + "}");
 
         } catch (Exception e) {
             res.status(400);

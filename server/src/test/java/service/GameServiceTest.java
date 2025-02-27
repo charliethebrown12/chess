@@ -2,7 +2,6 @@ package service;
 
 import dataAccess.DataAccessException;
 import dataAccess.GameMemoryDataAccess;
-import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
