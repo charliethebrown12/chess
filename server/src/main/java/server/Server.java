@@ -17,10 +17,13 @@ public class Server {
 
         RegisterHandler registerHandler = new RegisterHandler();
         LoginHandler loginHandler = new LoginHandler();
+        LogoutHandler logoutHandler = new LogoutHandler();
 
         Spark.post("/user", registerHandler::register);
 
         Spark.post("/session" , loginHandler::login);
+
+        Spark.delete("/session" , logoutHandler::logout);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
