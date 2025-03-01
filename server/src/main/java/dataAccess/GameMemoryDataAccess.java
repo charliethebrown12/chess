@@ -64,4 +64,9 @@ public class GameMemoryDataAccess implements GameAccess {
         GamesList newGamesList = new GamesList(game);
         gamesList.add(newGamesList);
     }
+
+    public void deleteAll() {
+        games.clear();
+        gamesList.clear();
+    }
 }

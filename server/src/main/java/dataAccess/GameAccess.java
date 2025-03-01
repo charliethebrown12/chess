@@ -15,4 +15,6 @@ public interface GameAccess {
     void deleteGame(int gameID) throws DataAccessException;
 
     void addGame(GameData game) throws DataAccessException;
+
+    void deleteAll() throws DataAccessException;
 }

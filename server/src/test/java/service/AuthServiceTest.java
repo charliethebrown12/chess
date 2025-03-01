@@ -79,4 +79,11 @@ class AuthServiceTest {
         assertNotEquals("test1", user, "Username should not match");
     }
 
+    @Test void testDeleteAll() throws DataAccessException {
+        AuthData auth = authService.createAuth("test");
+        assert(!auth.authToken().isEmpty());
+        authService.deleteAll();
+        assertFalse(authService.getAuth(auth.authToken()));
+    }
+
 }

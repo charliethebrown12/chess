@@ -34,4 +34,8 @@ public class AuthService {
     public String getUser(String AuthToken) throws DataAccessException {
         return authAccess.getUsername(AuthToken);
     }
+
+    public void deleteAll() throws DataAccessException {
+        authAccess.deleteAll();
+    }
 }

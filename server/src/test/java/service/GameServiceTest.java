@@ -2,14 +2,14 @@ package service;
 
 import dataAccess.DataAccessException;
 import dataAccess.GameMemoryDataAccess;
+import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
     private GameService gameService;
@@ -70,5 +70,9 @@ public class GameServiceTest {
         );
 
         assertEquals("Game ID does not exist.", exception.getMessage());
+    }
+
+    @Test void testDeleteAll() throws DataAccessException {
+
     }
 }

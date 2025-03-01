@@ -41,4 +41,8 @@ public class GameService {
         gameAccess.addGame(updateGame);
         System.out.println(updateGame);
     }
+
+    public void deleteAll() throws DataAccessException {
+        gameAccess.deleteAll();
+    }
 }

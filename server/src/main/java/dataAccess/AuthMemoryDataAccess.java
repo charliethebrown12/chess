@@ -60,4 +60,8 @@ public class AuthMemoryDataAccess  implements AuthAccess{
             throw new DataAccessException("Error retrieving user: " + e.getMessage());
         }
     }
+
+    public void deleteAll() {
+        auths.clear();
+    }
 }

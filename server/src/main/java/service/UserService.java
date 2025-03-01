@@ -33,4 +33,8 @@ public class UserService {
         }
         return userAccess.getUser(username);
     }
+
+    public void deleteAll() throws DataAccessException {
+        userAccess.deleteAll();
+    }
 }

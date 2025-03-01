@@ -37,4 +37,8 @@ public class UserMemoryDataAccess implements UserAccess {
             throw new DataAccessException("Error creating user: " + e.getMessage());
         }
     }
+
+    public void deleteAll() {
+        users.clear();
+    }
 }
