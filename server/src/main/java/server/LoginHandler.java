@@ -1,8 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
-import dataAccess.AuthMemoryDataAccess;
-import dataAccess.UserMemoryDataAccess;
+import dataaccess.AuthMemoryDataAccess;
+import dataaccess.UserMemoryDataAccess;
 import model.AuthData;
 import model.ErrorData;
 import model.UserData;

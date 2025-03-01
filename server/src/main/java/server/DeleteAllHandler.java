@@ -1,9 +1,9 @@
 package server;
 
 import com.google.gson.Gson;
-import dataAccess.AuthMemoryDataAccess;
-import dataAccess.GameMemoryDataAccess;
-import dataAccess.UserMemoryDataAccess;
+import dataaccess.AuthMemoryDataAccess;
+import dataaccess.GameMemoryDataAccess;
+import dataaccess.UserMemoryDataAccess;
 import model.ErrorData;
 import service.AuthService;
 import service.GameService;

@@ -1,8 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
-import dataAccess.AuthMemoryDataAccess;
-import dataAccess.GameMemoryDataAccess;
+import dataaccess.AuthMemoryDataAccess;
+import dataaccess.GameMemoryDataAccess;
 import model.ErrorData;
 import model.GameData;
 import service.AuthService;
@@ -17,12 +17,12 @@ public class CreateGameHandler {
     private final GameService gameService = new GameService(new GameMemoryDataAccess());
 
     Object createGame(Request req, Response res) {
-        String AuthToken = req.headers("Authorization");
+        String authToken = req.headers("Authorization");
         var newGame = new Gson().fromJson(req.body(), GameData.class);
 
 
         try {
-            if(!authService.getAuth(AuthToken)) {
+            if(!authService.getAuth(authToken)) {
                 res.status(401);
                 return new Gson().toJson((new ErrorData("Error: User is not authorized. Please login")));
             }

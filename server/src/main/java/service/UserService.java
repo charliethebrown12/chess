@@ -1,7 +1,7 @@
 package service;
 
-import dataAccess.DataAccessException;
-import dataAccess.UserAccess;
+import dataaccess.DataAccessException;
+import dataaccess.UserAccess;
 import model.UserData;
 
 public class UserService {

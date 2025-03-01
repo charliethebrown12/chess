@@ -1,7 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dataAccess.AuthMemoryDataAccess;
+import dataaccess.AuthMemoryDataAccess;
 import model.ErrorData;
 import service.AuthService;
 import spark.Request;
@@ -11,14 +11,14 @@ public class LogoutHandler {
     private final AuthService authService = new AuthService(new AuthMemoryDataAccess());
 
     Object logout(Request req, Response res) {
-        String AuthToken = req.headers("Authorization");
+        String authToken = req.headers("Authorization");
 
         try {
-            if(!authService.getAuth(AuthToken)) {
+            if(!authService.getAuth(authToken)) {
                 res.status(401);
                 return new Gson().toJson((new ErrorData("Error: User is not authorized. Please login")));
             }
-            authService.deleteAuth(AuthToken);
+            authService.deleteAuth(authToken);
             return new Gson().toJson(new Object());
 
         } catch (Exception e) {

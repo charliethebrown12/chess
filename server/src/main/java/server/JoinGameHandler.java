@@ -1,8 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
-import dataAccess.AuthMemoryDataAccess;
-import dataAccess.GameMemoryDataAccess;
+import dataaccess.AuthMemoryDataAccess;
+import dataaccess.GameMemoryDataAccess;
 import model.ErrorData;
 import service.AuthService;
 import service.GameService;
@@ -14,16 +14,16 @@ public class JoinGameHandler {
     private final GameService gameService = new GameService(new GameMemoryDataAccess());
 
     Object joinGame(Request req, Response res) {
-        String AuthToken = req.headers("Authorization");
+        String authToken = req.headers("Authorization");
         var joinRequest = new Gson().fromJson(req.body(), JoinGameRequest.class);
 
 
         try {
-            if(!authService.getAuth(AuthToken)) {
+            if(!authService.getAuth(authToken)) {
                 res.status(401);
                 return new Gson().toJson((new ErrorData("Error: User is not authorized. Please login")));
             }
-            String user = authService.getUser(AuthToken);
+            String user = authService.getUser(authToken);
             gameService.joinGame(joinRequest.gameID(), joinRequest.playerColor(), user);
             return new Gson().toJson(new Object());
 

@@ -1,7 +1,7 @@
 package service;
 
-import dataAccess.AuthAccess;
-import dataAccess.DataAccessException;
+import dataaccess.AuthAccess;
+import dataaccess.DataAccessException;
 import model.AuthData;
 
 import java.util.UUID;
@@ -27,12 +27,12 @@ public class AuthService {
         return auth != null;
     }
 
-    public void deleteAuth(String AuthToken) throws DataAccessException {
-        authAccess.deleteAuth(AuthToken);
+    public void deleteAuth(String authToken) throws DataAccessException {
+        authAccess.deleteAuth(authToken);
     }
 
-    public String getUser(String AuthToken) throws DataAccessException {
-        return authAccess.getUsername(AuthToken);
+    public String getUser(String authToken) throws DataAccessException {
+        return authAccess.getUsername(authToken);
     }
 
     public void deleteAll() throws DataAccessException {

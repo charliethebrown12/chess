@@ -1,7 +1,7 @@
 package service;
 
-import dataAccess.DataAccessException;
-import dataAccess.UserMemoryDataAccess;
+import dataaccess.DataAccessException;
+import dataaccess.UserMemoryDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.*;
 
