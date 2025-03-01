@@ -30,4 +30,6 @@ public class GamesList {
     public String getGameName() {
         return gameName;
     }
+
+
 }

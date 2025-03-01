@@ -12,26 +12,25 @@ public class AuthMemoryDataAccess  implements AuthAccess{
         this.auths = new ArrayList<>();
     }
 
-    public boolean getAuth(String authToken) throws DataAccessException {
+    public AuthData getAuth(String authToken) throws DataAccessException {
         try {
             for (AuthData auth : auths) {
                 if (authToken.equals(auth.authToken())) {
-                    return true;
+                    return auth;
                 }
             }
-            return false;
+            return null;
         }
         catch (Exception e) {
             throw new DataAccessException("Error retrieving user: " + e.getMessage());
         }
     }
 
-    public AuthData createAuth(String username, String authToken) throws DataAccessException {
+    public AuthData createAuth(AuthData authToken) throws DataAccessException {
         try {
-            AuthData newAuth = new AuthData(username, authToken);
-            auths.add(newAuth);
+            auths.add(authToken);
             System.out.println(auths);
-            return newAuth;
+            return authToken;
         }
         catch (Exception e) {
             throw new DataAccessException("Error creating user: " + e.getMessage());
@@ -45,6 +44,20 @@ public class AuthMemoryDataAccess  implements AuthAccess{
         }
         catch (Exception e) {
             throw new DataAccessException("Error deleting user: " + e.getMessage());
+        }
+    }
+
+    public String getUsername(String authToken) throws DataAccessException {
+        try {
+            for (AuthData auth : auths) {
+                if (authToken.equals(auth.authToken())) {
+                    return auth.username();
+                }
+            }
+            throw new DataAccessException("Error retrieving user: ");
+        }
+        catch (Exception e) {
+            throw new DataAccessException("Error retrieving user: " + e.getMessage());
         }
     }
 }

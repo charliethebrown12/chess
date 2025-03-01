@@ -18,14 +18,20 @@ public class AuthService {
             throw new DataAccessException("Username cannot be empty");
         }
         UUID uuid = UUID.randomUUID();
-        return authAccess.createAuth(uuid.toString(), username);
+        AuthData newAuth = new AuthData(uuid.toString(), username);
+        return authAccess.createAuth(newAuth);
     }
 
     public boolean getAuth(String authToken) throws DataAccessException {
-        return authAccess.getAuth(authToken);
+        AuthData auth = authAccess.getAuth(authToken);
+        return auth != null;
     }
 
     public void deleteAuth(String AuthToken) throws DataAccessException {
         authAccess.deleteAuth(AuthToken);
+    }
+
+    public String getUser(String AuthToken) throws DataAccessException {
+        return authAccess.getUsername(AuthToken);
     }
 }

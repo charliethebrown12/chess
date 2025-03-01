@@ -54,4 +54,21 @@ public class GameServiceTest {
 
         assertEquals("No games found. Please create a new game.", exception.getMessage());
     }
+
+    @Test
+    void testJoinGameSuccess() throws DataAccessException {
+        gameService.createGame("test");
+        gameService.joinGame(1, "WHITE", "testUser");
+        List<GamesList> games = gameService.getGames();
+        assertEquals(1, games.size(), "Number of games should be 1");
+    }
+
+    @Test
+    void testJoinGameFailure() {
+        DataAccessException exception = assertThrows(DataAccessException.class, () ->
+                gameService.joinGame(1, "BLACK", "testUser")
+        );
+
+        assertEquals("Game ID does not exist.", exception.getMessage());
+    }
 }

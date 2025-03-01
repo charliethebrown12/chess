@@ -65,4 +65,18 @@ class AuthServiceTest {
         assertFalse(after);
     }
 
+    @Test
+    void testGetUser() throws DataAccessException {
+        AuthData auth = authService.createAuth("test");
+        String user = authService.getUser(auth.authToken());
+        assertEquals("test", user, "Username should match");
+    }
+
+    @Test
+    void testGetUserDNE() throws DataAccessException {
+        AuthData auth = authService.createAuth("test");
+        String user = authService.getUser(auth.authToken());
+        assertNotEquals("test1", user, "Username should not match");
+    }
+
 }

@@ -44,4 +44,24 @@ public class GameMemoryDataAccess implements GameAccess {
             throw new DataAccessException(e.getMessage());
         }
     }
+
+    public GameData joinGame(int gameID) throws DataAccessException {
+        for (GameData game : games) {
+            if (gameID == game.gameID()) {
+                return game;
+            }
+        }
+        throw new DataAccessException("Game ID does not exist.");
+    }
+
+    public void deleteGame(int gameID) {
+        gamesList.removeIf(game -> game.getGameID() == gameID);
+        games.removeIf(game -> gameID == game.gameID());
+    }
+
+    public void addGame(GameData game) {
+        games.add(game);
+        GamesList newGamesList = new GamesList(game);
+        gamesList.add(newGamesList);
+    }
 }
