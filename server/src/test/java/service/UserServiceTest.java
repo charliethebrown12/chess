@@ -50,4 +50,15 @@ class UserServiceTest {
         assertEquals("Error getting user: User not found", exception.getMessage());
     }
 
+    @Test void testDeleteAll() throws DataAccessException {
+        userService.createUser("test", "password", "test@example.com");
+        UserData user = userService.getUser("test");
+        assertNotNull(user, "User should not be null");
+        userService.deleteAll();
+        DataAccessException exception = assertThrows(DataAccessException.class, () ->
+                userService.getUser("test")
+        );
+        assertEquals("Error getting user: User not found", exception.getMessage());
+    }
+
 }

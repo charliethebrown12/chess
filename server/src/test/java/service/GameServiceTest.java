@@ -2,8 +2,6 @@ package service;
 
 import dataAccess.DataAccessException;
 import dataAccess.GameMemoryDataAccess;
-import model.AuthData;
-import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -73,6 +71,13 @@ public class GameServiceTest {
     }
 
     @Test void testDeleteAll() throws DataAccessException {
-
+        gameService.createGame("test");
+        List<GamesList> games = gameService.getGames();
+        assertEquals(1, games.size(), "Number of games should be 1");
+        gameService.deleteAll();
+        DataAccessException exception = assertThrows(DataAccessException.class, () ->
+                gameService.getGames()
+        );
+        assertEquals("No games found. Please create a new game.", exception.getMessage());
     }
 }
