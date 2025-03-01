@@ -20,7 +20,7 @@ public class GameMemoryDataAccess implements GameAccess {
 
     public int createGame(String gameName) throws DataAccessException {
         try {
-            GameData newGame = new GameData(counter, "", "", gameName, new ChessGame());
+            GameData newGame = new GameData(counter, null, null, gameName, new ChessGame());
             GamesList newGamesList = new GamesList(newGame);
             this.games.add(newGame);
             this.gamesList.add(newGamesList);
@@ -35,10 +35,7 @@ public class GameMemoryDataAccess implements GameAccess {
 
     public List<GamesList> getGames() throws DataAccessException {
         try {
-            if (!games.isEmpty()) {
-                return gamesList;
-            }
-            else {throw new DataAccessException("No games found. Please create a new game.");}
+            return gamesList;
         }
         catch (Exception e) {
             throw new DataAccessException(e.getMessage());

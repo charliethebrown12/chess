@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataAccess.AuthMemoryDataAccess;
 import dataAccess.UserMemoryDataAccess;
 import model.AuthData;
+import model.ErrorData;
 import model.UserData;
 import service.AuthService;
 import service.UserService;
@@ -17,15 +18,21 @@ public class LoginHandler {
     Object login(Request req, Response res) {
         var newUser = new Gson().fromJson(req.body(), UserData.class);
         var newAuth = new Gson().fromJson(req.body(), AuthData.class);
+        Gson gson = new Gson();
 
         try {
-            userService.getUser(newUser.username());
+            newUser = userService.getUser(newUser.username(), newUser.password());
+            if (newUser == null) {
+                res.status(401);
+                res.type("application/json");
+                return gson.toJson((new ErrorData("Error: Invalid username or password")));
+            }
             newAuth = authService.createAuth(newAuth.username());
-            return new Gson().toJson(newAuth);
+            return gson.toJson(newAuth);
 
         } catch (Exception e) {
             res.status(400);
-            return new Gson().toJson("User does not exist. Please try again or register.");
+            return gson.toJson(new ErrorData("Error: " + e.getMessage()));
         }
     }
 }

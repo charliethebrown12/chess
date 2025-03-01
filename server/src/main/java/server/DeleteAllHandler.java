@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataAccess.AuthMemoryDataAccess;
 import dataAccess.GameMemoryDataAccess;
 import dataAccess.UserMemoryDataAccess;
+import model.ErrorData;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
@@ -24,7 +25,7 @@ public class DeleteAllHandler {
 
         } catch (Exception e) {
             res.status(400);
-            return new Gson().toJson("Error: " + e.getMessage());
+            return new Gson().toJson(new ErrorData("Error: " + e.getMessage()));
         }
     }
 }

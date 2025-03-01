@@ -2,13 +2,15 @@ package server;
 
 import com.google.gson.Gson;
 import dataAccess.AuthMemoryDataAccess;
-import dataAccess.DataAccessException;
 import dataAccess.GameMemoryDataAccess;
+import model.ErrorData;
 import model.GameData;
 import service.AuthService;
 import service.GameService;
 import spark.Request;
 import spark.Response;
+
+import java.util.Map;
 
 public class CreateGameHandler {
     private final AuthService authService = new AuthService(new AuthMemoryDataAccess());
@@ -21,14 +23,15 @@ public class CreateGameHandler {
 
         try {
             if(!authService.getAuth(AuthToken)) {
-                throw new DataAccessException("User is not authorized to logout.");
+                res.status(401);
+                return new Gson().toJson((new ErrorData("Error: User is not authorized. Please login")));
             }
             int gameID = gameService.createGame(newGame.gameName());
-            return new Gson().toJson("{ gameID: " + gameID + "}");
+            return new Gson().toJson(Map.of("gameID", gameID));
 
         } catch (Exception e) {
             res.status(400);
-            return new Gson().toJson("Error logging out: " + e.getMessage());
+            return new Gson().toJson(new ErrorData("Error: " + e.getMessage()));
         }
     }
 }

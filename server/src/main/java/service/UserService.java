@@ -21,17 +21,14 @@ public class UserService {
         if (email == null || email.isEmpty()) {
             throw new DataAccessException("Email cannot be empty");
         }
-        if (!email.contains("@")) {
-            throw new DataAccessException("Email must contain @");
-        }
         return userAccess.createUser(username, password, email);
     }
 
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username, String password) throws DataAccessException {
         if (username == null || username.isEmpty()) {
             throw new DataAccessException("Username cannot be empty");
         }
-        return userAccess.getUser(username);
+        return userAccess.getUser(username, password);
     }
 
     public void deleteAll() throws DataAccessException {

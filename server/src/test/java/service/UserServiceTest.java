@@ -25,40 +25,35 @@ class UserServiceTest {
     }
 
     @Test
-    void testCreateUserDuplicate() {
+    void testCreateUserDuplicate() throws DataAccessException {
         assertDoesNotThrow(() -> userService.createUser("testuser", "password123", "test@example.com"));
-
-        DataAccessException exception = assertThrows(DataAccessException.class, () ->
-                userService.createUser("testuser", "newpass", "newemail@example.com")
-        );
-
-        assertEquals("Error creating user: User already exists", exception.getMessage());
+        UserData user = userService.createUser("testuser", "newpass", "newemail@example.com");
+        assertNull(user);
     }
 
     @Test
     void testGetUserSuccess() throws DataAccessException {
         UserData user = userService.createUser("test", "password", "test@example.com");
         assertNotNull(user, "User should not be null");
-        UserData user2 = userService.getUser("test");
+        UserData user2 = userService.getUser("test", "password");
         assertNotNull(user2, "User should not be null");
         assertEquals("test", user2.username(), "Username should match");
     }
 
     @Test
-    void testGetUserNotFound() {
-        DataAccessException exception = assertThrows(DataAccessException.class, () -> userService.getUser("notausername"));
-        assertEquals("Error getting user: User not found", exception.getMessage());
+    void testGetUserNotFound() throws DataAccessException {
+        userService.createUser("test", "password", "test@example.coom");
+        UserData nothing = userService.getUser("test", "differentpassword");
+        assertNull(nothing);
     }
 
     @Test void testDeleteAll() throws DataAccessException {
         userService.createUser("test", "password", "test@example.com");
-        UserData user = userService.getUser("test");
+        UserData user = userService.getUser("test", "password");
         assertNotNull(user, "User should not be null");
         userService.deleteAll();
-        DataAccessException exception = assertThrows(DataAccessException.class, () ->
-                userService.getUser("test")
-        );
-        assertEquals("Error getting user: User not found", exception.getMessage());
+        UserData user1 = userService.getUser("test", "password");
+        assertNull(user1);
     }
 
 }

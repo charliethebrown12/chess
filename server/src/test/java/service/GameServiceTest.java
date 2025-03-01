@@ -45,12 +45,9 @@ public class GameServiceTest {
     }
 
     @Test
-    void testGetGamesNoGames() {
-        DataAccessException exception = assertThrows(DataAccessException.class, () ->
-                gameService.getGames()
-        );
-
-        assertEquals("No games found. Please create a new game.", exception.getMessage());
+    void testGetGamesNoGames() throws DataAccessException {
+        List<GamesList> games = gameService.getGames();
+        assertEquals(0, games.size(), "Number of games should be 0");
     }
 
     @Test
@@ -75,9 +72,6 @@ public class GameServiceTest {
         List<GamesList> games = gameService.getGames();
         assertEquals(1, games.size(), "Number of games should be 1");
         gameService.deleteAll();
-        DataAccessException exception = assertThrows(DataAccessException.class, () ->
-                gameService.getGames()
-        );
-        assertEquals("No games found. Please create a new game.", exception.getMessage());
+        assertEquals(0, games.size(), "Number of games should be 0");
     }
 }

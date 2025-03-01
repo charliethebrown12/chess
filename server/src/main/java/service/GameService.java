@@ -27,19 +27,28 @@ public class GameService {
 
     public void joinGame(int gameID, String playerColor, String user) throws DataAccessException {
         GameData game = gameAccess.joinGame(gameID);
+        String whiteUsername = game.whiteUsername();
+        String blackUsername = game.blackUsername();
         gameAccess.deleteGame(gameID);
         GameData updateGame;
         if (Objects.equals(playerColor, "WHITE")) {
-            updateGame = new GameData(game.gameID(), user, game.blackUsername(), game.gameName(), game.game());
+            if (whiteUsername == null) {
+                updateGame = new GameData(game.gameID(), user, game.blackUsername(), game.gameName(), game.game());
+                gameAccess.addGame(updateGame);
+            }
         }
         else if (Objects.equals(playerColor, "BLACK")) {
-            updateGame = new GameData(game.gameID(), game.whiteUsername(), user, game.gameName(), game.game());
+            if (blackUsername == null) {
+                updateGame = new GameData(game.gameID(), game.whiteUsername(), user, game.gameName(), game.game());
+                gameAccess.addGame(updateGame);
+            }
+            else {
+                throw new DataAccessException("That color is already in use by another player");
+            }
         }
         else {
-            throw new DataAccessException("Please set player color to WHITE or BLACK");
+            throw new DataAccessException("Invalid game");
         }
-        gameAccess.addGame(updateGame);
-        System.out.println(updateGame);
     }
 
     public void deleteAll() throws DataAccessException {

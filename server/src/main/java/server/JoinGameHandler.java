@@ -2,8 +2,8 @@ package server;
 
 import com.google.gson.Gson;
 import dataAccess.AuthMemoryDataAccess;
-import dataAccess.DataAccessException;
 import dataAccess.GameMemoryDataAccess;
+import model.ErrorData;
 import service.AuthService;
 import service.GameService;
 import spark.Request;
@@ -20,15 +20,20 @@ public class JoinGameHandler {
 
         try {
             if(!authService.getAuth(AuthToken)) {
-                throw new DataAccessException("User is not authorized to join game.");
+                res.status(401);
+                return new Gson().toJson((new ErrorData("Error: User is not authorized. Please login")));
             }
             String user = authService.getUser(AuthToken);
             gameService.joinGame(joinRequest.gameID(), joinRequest.playerColor(), user);
             return new Gson().toJson(new Object());
 
         } catch (Exception e) {
+            if (e.getMessage().equals("That color is already in use by another player")) {
+                res.status(403);
+                return new Gson().toJson((new ErrorData("Error: " + e.getMessage())));
+            }
             res.status(400);
-            return new Gson().toJson("Error: " + e.getMessage());
+            return new Gson().toJson(new ErrorData("Error: " + e.getMessage()));
         }
     }
 }

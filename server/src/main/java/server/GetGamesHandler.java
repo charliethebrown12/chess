@@ -2,9 +2,8 @@ package server;
 
 import com.google.gson.Gson;
 import dataAccess.AuthMemoryDataAccess;
-import dataAccess.DataAccessException;
 import dataAccess.GameMemoryDataAccess;
-import model.GameData;
+import model.ErrorData;
 import service.AuthService;
 import service.GameService;
 import service.GamesList;
@@ -12,6 +11,7 @@ import spark.Request;
 import spark.Response;
 
 import java.util.List;
+import java.util.Map;
 
 public class GetGamesHandler {
     private final AuthService authService = new AuthService(new AuthMemoryDataAccess());
@@ -22,14 +22,15 @@ public class GetGamesHandler {
 
         try {
             if(!authService.getAuth(AuthToken)) {
-                throw new DataAccessException("User is not authorized to get games list. Please login first.");
+                res.status(401);
+                return new Gson().toJson((new ErrorData("Error: User is not authorized. Please login")));
             }
             List<GamesList> games = gameService.getGames();
-            return new Gson().toJson(games);
+            return new Gson().toJson(Map.of("games", games));
 
         } catch (Exception e) {
             res.status(400);
-            return new Gson().toJson(e.getMessage());
+            return new Gson().toJson(new ErrorData("Error: " + e.getMessage()));
         }
     }
 }
