@@ -3,6 +3,7 @@ package service;
 import dataaccess.DataAccessException;
 import dataaccess.UserAccess;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     private static UserAccess userAccess;
@@ -21,17 +22,23 @@ public class UserService {
         if (email == null || email.isEmpty()) {
             throw new DataAccessException("Email cannot be empty");
         }
-        return userAccess.createUser(username, password, email);
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        return userAccess.createUser(username, hashedPassword, email);
     }
 
     public UserData getUser(String username, String password) throws DataAccessException {
         if (username == null || username.isEmpty()) {
             throw new DataAccessException("Username cannot be empty");
         }
-        return userAccess.getUser(username, password);
+        UserData user = userAccess.getUser(username, password);
+        if (BCrypt.checkpw(password, BCrypt.gensalt())) {
+            return user;
+        }
+        throw new DataAccessException("Password is incorrect");
     }
 
     public void deleteAll() throws DataAccessException {
         userAccess.deleteAll();
     }
+
 }

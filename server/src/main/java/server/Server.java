@@ -1,5 +1,8 @@
 package server;
 
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
+import dataaccess.UserMySqlDataAccess;
 import spark.*;
 
 public class Server {
@@ -10,10 +13,12 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        Spark.get("/auth/:username", (req, res) -> {
-            String username = req.params(":username");
-            return "Auth token for user " + username + " nothing yet";
-        });
+        try {
+            new UserMySqlDataAccess();
+        } catch (DataAccessException e) {
+            return -1;
+        }
+
 
         RegisterHandler registerHandler = new RegisterHandler();
         LoginHandler loginHandler = new LoginHandler();
