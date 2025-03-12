@@ -11,13 +11,6 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        try {
-            new UserMySqlDataAccess();
-            new AuthMySqlDataAccess();
-            new GameMySqlDataAccess();
-        } catch (DataAccessException e) {
-            return -1;
-        }
 
 
         RegisterHandler registerHandler = new RegisterHandler();

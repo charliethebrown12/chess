@@ -2,7 +2,9 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.AuthMemoryDataAccess;
+import dataaccess.AuthMySqlDataAccess;
 import dataaccess.GameMemoryDataAccess;
+import dataaccess.GameMySqlDataAccess;
 import model.ErrorData;
 import service.AuthService;
 import service.GameService;
@@ -14,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 public class GetGamesHandler {
-    private final AuthService authService = new AuthService(new AuthMemoryDataAccess());
-    private final GameService gameService = new GameService(new GameMemoryDataAccess());
+    private final AuthService authService = new AuthService(new AuthMySqlDataAccess());
+    private final GameService gameService = new GameService(new GameMySqlDataAccess());
 
     Object getGames(Request req, Response res) {
         String authToken = req.headers("Authorization");

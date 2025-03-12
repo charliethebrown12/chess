@@ -6,7 +6,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class AuthMySqlDataAccess implements AuthAccess{
-    public AuthMySqlDataAccess() throws DataAccessException {
+    public AuthMySqlDataAccess() {
         DatabaseManager.createDatabase();
         createTables();
     }
@@ -112,15 +112,15 @@ public class AuthMySqlDataAccess implements AuthAccess{
             """
     };
 
-    private void createTables() throws DataAccessException {
+    private void createTables()  {
         try (Connection conn = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }
-        } catch (SQLException e) {
-            throw new DataAccessException("Failed to create tables: " + e.getMessage());
+        } catch (SQLException | DataAccessException e) {
+            System.err.println("Failed to create tables: " + e.getMessage());
         }
     }
 }

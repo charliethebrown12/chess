@@ -2,7 +2,9 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.AuthMemoryDataAccess;
+import dataaccess.AuthMySqlDataAccess;
 import dataaccess.UserMemoryDataAccess;
+import dataaccess.UserMySqlDataAccess;
 import model.AuthData;
 import model.ErrorData;
 import model.UserData;
@@ -12,8 +14,8 @@ import spark.Request;
 import spark.Response;
 
 public class LoginHandler {
-    private final UserService userService = new UserService(new UserMemoryDataAccess());
-    private final AuthService authService = new AuthService(new AuthMemoryDataAccess());
+    private final UserService userService = new UserService(new UserMySqlDataAccess());
+    private final AuthService authService = new AuthService(new AuthMySqlDataAccess());
 
     Object login(Request req, Response res) {
         var newUser = new Gson().fromJson(req.body(), UserData.class);

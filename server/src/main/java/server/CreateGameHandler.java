@@ -2,7 +2,9 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.AuthMemoryDataAccess;
+import dataaccess.AuthMySqlDataAccess;
 import dataaccess.GameMemoryDataAccess;
+import dataaccess.GameMySqlDataAccess;
 import model.ErrorData;
 import model.GameData;
 import service.AuthService;
@@ -13,8 +15,8 @@ import spark.Response;
 import java.util.Map;
 
 public class CreateGameHandler {
-    private final AuthService authService = new AuthService(new AuthMemoryDataAccess());
-    private final GameService gameService = new GameService(new GameMemoryDataAccess());
+    private final AuthService authService = new AuthService(new AuthMySqlDataAccess());
+    private final GameService gameService = new GameService(new GameMySqlDataAccess());
 
     Object createGame(Request req, Response res) {
         String authToken = req.headers("Authorization");

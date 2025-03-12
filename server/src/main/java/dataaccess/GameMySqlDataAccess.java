@@ -3,7 +3,6 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
-import model.UserData;
 import service.GamesList;
 
 import java.sql.Connection;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameMySqlDataAccess implements GameAccess{
-    public GameMySqlDataAccess() throws DataAccessException {
+    public GameMySqlDataAccess() {
         DatabaseManager.createDatabase();
         createTables();
     }
@@ -142,7 +141,7 @@ public class GameMySqlDataAccess implements GameAccess{
             """
     };
 
-    private void createTables() throws DataAccessException {
+    private void createTables() {
         try (Connection conn = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
@@ -150,8 +149,8 @@ public class GameMySqlDataAccess implements GameAccess{
                 }
             }
             System.out.println("Tables created successfully.");
-        } catch (SQLException e) {
-            throw new DataAccessException("Failed to create tables: " + e.getMessage());
+        } catch (SQLException | DataAccessException e) {
+            System.err.println("Failed to create tables: " + e.getMessage());
         }
     }
 }

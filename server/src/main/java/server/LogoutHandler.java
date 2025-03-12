@@ -2,13 +2,14 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.AuthMemoryDataAccess;
+import dataaccess.AuthMySqlDataAccess;
 import model.ErrorData;
 import service.AuthService;
 import spark.Request;
 import spark.Response;
 
 public class LogoutHandler {
-    private final AuthService authService = new AuthService(new AuthMemoryDataAccess());
+    private final AuthService authService = new AuthService(new AuthMySqlDataAccess());
 
     Object logout(Request req, Response res) {
         String authToken = req.headers("Authorization");

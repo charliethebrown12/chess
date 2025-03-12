@@ -1,9 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.AuthMemoryDataAccess;
-import dataaccess.GameMemoryDataAccess;
-import dataaccess.UserMemoryDataAccess;
+import dataaccess.*;
 import model.ErrorData;
 import service.AuthService;
 import service.GameService;
@@ -12,9 +10,9 @@ import spark.Request;
 import spark.Response;
 
 public class DeleteAllHandler {
-    private final AuthService authService = new AuthService(new AuthMemoryDataAccess());
-    private final GameService gameService = new GameService(new GameMemoryDataAccess());
-    private final UserService userService = new UserService(new UserMemoryDataAccess());
+    private final AuthService authService = new AuthService(new AuthMySqlDataAccess());
+    private final GameService gameService = new GameService(new GameMySqlDataAccess());
+    private final UserService userService = new UserService(new UserMySqlDataAccess());
 
     Object deleteAll(Request req, Response res) {
         try {
