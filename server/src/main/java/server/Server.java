@@ -1,9 +1,6 @@
 package server;
 
-import dataaccess.AuthMySqlDataAccess;
-import dataaccess.DataAccessException;
-import dataaccess.DatabaseManager;
-import dataaccess.UserMySqlDataAccess;
+import dataaccess.*;
 import spark.*;
 
 public class Server {
@@ -17,6 +14,7 @@ public class Server {
         try {
             new UserMySqlDataAccess();
             new AuthMySqlDataAccess();
+            new GameMySqlDataAccess();
         } catch (DataAccessException e) {
             return -1;
         }
