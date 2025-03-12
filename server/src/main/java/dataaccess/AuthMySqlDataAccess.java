@@ -12,7 +12,7 @@ public class AuthMySqlDataAccess implements AuthAccess{
     }
 
     public AuthData getAuth(String authToken) throws DataAccessException {
-        String statement = "SELECT authToken, username, FROM auths WHERE token = ?";
+        String statement = "SELECT token, username FROM auths WHERE token = ?";
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, authToken);
@@ -33,7 +33,7 @@ public class AuthMySqlDataAccess implements AuthAccess{
     }
 
     public AuthData createAuth(AuthData authToken) throws DataAccessException {
-        var statement = "INSERT INTO auths (authToken, username) VALUES (?, ?)";
+        var statement = "INSERT INTO auths (token, username) VALUES (?, ?)";
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, authToken.authToken());
@@ -53,7 +53,7 @@ public class AuthMySqlDataAccess implements AuthAccess{
     }
 
     public void deleteAuth(String authToken) throws DataAccessException {
-        String statement = "DELETE FROM users WHERE authToken = ?";
+        String statement = "DELETE FROM auths WHERE token = ?";
 
         try (var conn = DatabaseManager.getConnection()) {
             try (var prepareStatement = conn.prepareStatement(statement)) {
