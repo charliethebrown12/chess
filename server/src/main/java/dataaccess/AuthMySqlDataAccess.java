@@ -7,7 +7,6 @@ import java.sql.SQLException;
 
 public class AuthMySqlDataAccess implements AuthAccess{
     public AuthMySqlDataAccess() {
-        DatabaseManager.createDatabase();
         createTables();
     }
 

@@ -14,7 +14,6 @@ public class AuthDAOTests {
 
     @BeforeAll
     static void setUp() throws DataAccessException {
-        DatabaseManager.createDatabase();
         authDao = new AuthMySqlDataAccess();
         authDao.deleteAll();
     }

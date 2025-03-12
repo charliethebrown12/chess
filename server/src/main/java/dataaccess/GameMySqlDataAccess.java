@@ -12,7 +12,6 @@ import java.util.List;
 
 public class GameMySqlDataAccess implements GameAccess{
     public GameMySqlDataAccess() {
-        DatabaseManager.createDatabase();
         createTables();
     }
 

@@ -9,7 +9,6 @@ import java.sql.SQLIntegrityConstraintViolationException;
 
 public class UserMySqlDataAccess implements UserAccess {
     public UserMySqlDataAccess() {
-        DatabaseManager.createDatabase();
         createTables();
     }
 
