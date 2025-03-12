@@ -91,7 +91,7 @@ public class ChessGame {
             Collection<ChessMove> validMoves = new ArrayList<>();
             for (ChessMove move : moves) {
                 ChessGame boardCopy = new ChessGame(this);
-                boardCopy.getBoard().makeMove(move);;
+                boardCopy.getBoard().makeMove(move);
                 if (!boardCopy.isInCheck(teamColor)) {
                     validMoves.add(move);
                 }

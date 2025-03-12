@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.AuthMemoryDataAccess;
 import dataaccess.AuthMySqlDataAccess;
 import model.ErrorData;
 import service.AuthService;
