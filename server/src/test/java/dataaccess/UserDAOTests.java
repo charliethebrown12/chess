@@ -33,9 +33,8 @@ public class UserDAOTests {
 
     @Test
     void testCreateUserDuplicate() throws DataAccessException {
-        assertDoesNotThrow(() -> userDao.createUser("testuser", "password123", "test@example.com"));
-        UserData user = userDao.createUser("testuser", "newpass", "newemail@example.com");
-        assertNull(user);
+        assertDoesNotThrow(() -> userDao.createUser("testuser", "password123", "test@email.com"));
+        assertThrows(DataAccessException.class, () -> userDao.createUser("testuser", "newpass", "newemail@email.com"));
     }
 
     @Test
@@ -53,7 +52,8 @@ public class UserDAOTests {
         assertNull(nothing);
     }
 
-    @Test void testDeleteAll() throws DataAccessException {
+    @Test
+    void testDeleteAll() throws DataAccessException {
         userDao.createUser("test", "password", "test@example.com");
         UserData user = userDao.getUser("test", "password");
         assertNotNull(user, "User should not be null");

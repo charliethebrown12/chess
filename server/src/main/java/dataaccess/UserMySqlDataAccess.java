@@ -17,7 +17,9 @@ public class UserMySqlDataAccess implements UserAccess {
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, username);
                 try (var rs = preparedStatement.executeQuery()) {
-                    return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                    if (rs.next()) {
+                        return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                    } else {return null;}
 
                 } catch (SQLException e) {
                     throw new DataAccessException(e.getMessage());
@@ -34,13 +36,16 @@ public class UserMySqlDataAccess implements UserAccess {
         var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, username);
+                preparedStatement.setString(2, password);
+                preparedStatement.setString(3, email);
                 int affectedRows = preparedStatement.executeUpdate();
                 if (affectedRows == 0) {
                     throw new DataAccessException("No rows affected, user not created");
                 }
                 return new UserData(username, password, email);
             } catch (SQLException e) {
-                throw new DataAccessException("User creation failed" + e.getMessage());
+                throw new DataAccessException("User creation failed " + e.getMessage());
             }
 
         } catch (SQLException e) {
