@@ -32,7 +32,7 @@ public class UserDAOTests {
     }
 
     @Test
-    void testCreateUserDuplicate() throws DataAccessException {
+    void testCreateUserDuplicate() {
         assertDoesNotThrow(() -> userDao.createUser("testuser", "password123", "test@email.com"));
         assertThrows(DataAccessException.class, () -> userDao.createUser("testuser", "newpass", "newemail@email.com"));
     }

@@ -1,5 +1,6 @@
 package server;
 
+import dataaccess.AuthMySqlDataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.UserMySqlDataAccess;
@@ -15,6 +16,7 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         try {
             new UserMySqlDataAccess();
+            new AuthMySqlDataAccess();
         } catch (DataAccessException e) {
             return -1;
         }

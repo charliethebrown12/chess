@@ -2,35 +2,125 @@ package dataaccess;
 
 import model.AuthData;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 public class AuthMySqlDataAccess implements AuthAccess{
+    public AuthMySqlDataAccess() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        createTables();
+    }
 
     public AuthData getAuth(String authToken) throws DataAccessException {
-        return null;
+        String statement = "SELECT authToken, username, FROM auths WHERE token = ?";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, authToken);
+                try (var rs = preparedStatement.executeQuery()) {
+                    if (rs.next()) {
+                        return new AuthData(rs.getString("token"), rs.getString("username"));
+                    } else {return null;}
+
+                } catch (SQLException e) {
+                    throw new DataAccessException(e.getMessage());
+                }
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     public AuthData createAuth(AuthData authToken) throws DataAccessException {
-        return null;
+        var statement = "INSERT INTO auths (authToken, username) VALUES (?, ?)";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, authToken.authToken());
+                preparedStatement.setString(2, authToken.username());
+                int affectedRows = preparedStatement.executeUpdate();
+                if (affectedRows == 0) {
+                    throw new DataAccessException("No rows affected, auth token not created");
+                }
+                return authToken;
+            } catch (SQLException e) {
+                throw new DataAccessException("Auth token creation failed " + e.getMessage());
+            }
+
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     public void deleteAuth(String authToken) throws DataAccessException {
+        String statement = "DELETE FROM users WHERE authToken = ?";
 
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var prepareStatement = conn.prepareStatement(statement)) {
+                prepareStatement.setString(1, authToken);
+                prepareStatement.executeUpdate();
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     public String getUsername(String authToken) throws DataAccessException {
-        return "";
+        String statement = "SELECT username FROM auths WHERE token = ?";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, authToken);
+                try (var rs = preparedStatement.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("username");
+                    } else {return null;}
+
+                } catch (SQLException e) {
+                    throw new DataAccessException(e.getMessage());
+                }
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     public void deleteAll() throws DataAccessException {
+        String statement = "DELETE FROM auths";
 
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var prepareStatement = conn.prepareStatement(statement)) {
+                prepareStatement.executeUpdate();
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS  auths (
-              `token` VARCHAR(255) PRIMARY KEY,
-              `userID` INT,
-              FOREIGN KEY (`userID`) REFERENCES users (`id`)
+              token VARCHAR(255) PRIMARY KEY,
+              username VARCHAR(50) NOT NULL,
+              FOREIGN KEY (username) REFERENCES users (username) ON DELETE CASCADE
             );
             """
     };
+
+    private void createTables() throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (String statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to create tables: " + e.getMessage());
+        }
+    }
 }
