@@ -30,11 +30,7 @@ public class UserService {
         if (username == null || username.isEmpty()) {
             throw new DataAccessException("Username cannot be empty");
         }
-        UserData user = userAccess.getUser(username, password);
-        if (BCrypt.checkpw(password, BCrypt.gensalt())) {
-            return user;
-        }
-        throw new DataAccessException("Password is incorrect");
+        return userAccess.getUser(username, password);
     }
 
     public void deleteAll() throws DataAccessException {

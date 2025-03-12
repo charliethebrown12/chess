@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ public class UserMemoryDataAccess implements UserAccess {
     public UserData getUser(String username, String password) throws DataAccessException {
         try {
             for (UserData user : users) {
-                if (user.username().equals(username) && user.password().equals(password)) {
+                if (user.username().equals(username) && BCrypt.checkpw(password, user.password())) {
                     return user;
                 }
             }

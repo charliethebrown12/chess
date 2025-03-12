@@ -4,6 +4,7 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -39,7 +40,8 @@ public class UserDAOTests {
 
     @Test
     void testGetUserSuccess() throws DataAccessException {
-        UserData user = userDao.createUser("test", "password", "test@example.com");
+        String hashedPassword = BCrypt.hashpw("password", BCrypt.gensalt());
+        UserData user = userDao.createUser("test", hashedPassword, "test@example.com");
         assertNotNull(user, "User should not be null");
         UserData user2 = userDao.getUser("test", "password");
         assertNotNull(user2, "User should not be null");
@@ -48,13 +50,16 @@ public class UserDAOTests {
 
     @Test
     void testGetUserNotFound() throws DataAccessException {
+        String hashedPassword = BCrypt.hashpw("password", BCrypt.gensalt());
+        userDao.createUser("test", hashedPassword, "test@example.com");
         UserData nothing = userDao.getUser("test", "differentpassword");
         assertNull(nothing);
     }
 
     @Test
     void testDeleteAll() throws DataAccessException {
-        userDao.createUser("test", "password", "test@example.com");
+        String hashedPassword = BCrypt.hashpw("password", BCrypt.gensalt());
+        userDao.createUser("test", hashedPassword, "test@example.com");
         UserData user = userDao.getUser("test", "password");
         assertNotNull(user, "User should not be null");
         userDao.deleteAll();

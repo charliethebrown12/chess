@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -18,7 +19,10 @@ public class UserMySqlDataAccess implements UserAccess {
                 preparedStatement.setString(1, username);
                 try (var rs = preparedStatement.executeQuery()) {
                     if (rs.next()) {
-                        return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                        String hashedPassword = rs.getString("password");
+                        if (BCrypt.checkpw(password, hashedPassword)) {
+                            return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                        } else {return null;}
                     } else {return null;}
 
                 } catch (SQLException e) {
