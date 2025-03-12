@@ -110,7 +110,25 @@ public class GameMySqlDataAccess implements GameAccess{
     }
 
     public void addGame(GameData game) throws DataAccessException {
+        var statement = "INSERT INTO games (gameID, whiteUserID, blackUserID, gameName, chessGame) VALUES (?, ?, ?, ?, ?)";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                preparedStatement.setInt(1, game.gameID());
+                preparedStatement.setString(2, game.whiteUsername());
+                preparedStatement.setString(3, game.blackUsername());
+                preparedStatement.setString(4, game.gameName());
+                preparedStatement.setString(5, new Gson().toJson(game.game()));
+                int affectedRows = preparedStatement.executeUpdate();
+                if (affectedRows == 0) {
+                    throw new DataAccessException("No rows affected, game not created");
+                }
+            } catch (SQLException e) {
+                throw new DataAccessException("Game creation failed " + e.getMessage());
+            }
 
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     public void deleteAll() throws DataAccessException {
@@ -131,12 +149,10 @@ public class GameMySqlDataAccess implements GameAccess{
             """
             CREATE TABLE IF NOT EXISTS  games (
                 gameID int AUTO_INCREMENT PRIMARY KEY,
-                whiteUserID int,
-                blackUserID int,
+                whiteUserID VARCHAR(50),
+                blackUserID VARCHAR(50),
                 gameName VARCHAR(255) NOT NULL,
-                chessGame TEXT NOT NULL,
-                FOREIGN KEY (whiteUserID) REFERENCES users(id),
-                FOREIGN KEY (blackUserID) REFERENCES users(id)
+                chessGame TEXT NOT NULL
             );
             """
     };

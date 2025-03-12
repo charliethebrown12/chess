@@ -5,6 +5,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 public class UserMySqlDataAccess implements UserAccess {
     public UserMySqlDataAccess() {
@@ -48,11 +49,12 @@ public class UserMySqlDataAccess implements UserAccess {
                     throw new DataAccessException("No rows affected, user not created");
                 }
                 return new UserData(username, password, email);
-            } catch (SQLException e) {
-                throw new DataAccessException("User creation failed " + e.getMessage());
             }
 
-        } catch (SQLException e) {
+        } catch (SQLIntegrityConstraintViolationException e) {
+            return null;
+        }
+        catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
     }

@@ -33,9 +33,9 @@ public class UserDAOTests {
     }
 
     @Test
-    void testCreateUserDuplicate() {
+    void testCreateUserDuplicate() throws DataAccessException {
         assertDoesNotThrow(() -> userDao.createUser("testuser", "password123", "test@email.com"));
-        assertThrows(DataAccessException.class, () -> userDao.createUser("testuser", "newpass", "newemail@email.com"));
+        assertNull(userDao.createUser("testuser", "newpass", "newemail@email.com"));
     }
 
     @Test
