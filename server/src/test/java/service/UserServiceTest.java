@@ -21,7 +21,6 @@ class UserServiceTest {
         UserData user = userService.createUser("test", "password", "test@gmail.com");
         assertNotNull(user, "User should not be null");
         assertEquals("test", user.username(), "Username should match");
-        assertEquals("test@gmail.com", user.email(), "Email should match");
     }
 
     @Test

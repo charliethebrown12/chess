@@ -26,10 +26,10 @@ public class AuthDAOTests {
     @Test
     void testCreateAuthSuccess() throws DataAccessException {
         UUID uuid = UUID.randomUUID();
-        AuthData newAuth = new AuthData(uuid.toString(), "test");
+        AuthData newAuth = new AuthData(uuid.toString(), "test_user");
         AuthData auth = authDao.createAuth(newAuth);
         assertNotNull(auth, "User should not be null");
-        assertEquals("test", auth.username(), "Username should match");
+        assertEquals("test_user", auth.username(), "Username should match");
     }
 
     @Test
@@ -44,7 +44,7 @@ public class AuthDAOTests {
     @Test
     void testGetAuth() throws DataAccessException {
         UUID uuid = UUID.randomUUID();
-        AuthData newAuth = new AuthData(uuid.toString(), "test");
+        AuthData newAuth = new AuthData(uuid.toString(), "test_user");
         AuthData auth = authDao.createAuth(newAuth);
         auth = authDao.getAuth(auth.authToken());
         assertEquals(newAuth.username(), auth.username(), "Username should match");
@@ -58,7 +58,7 @@ public class AuthDAOTests {
 
     @Test
     void testDeleteAuth() throws DataAccessException {
-        AuthData newAuth = authDao.createAuth(new AuthData(UUID.randomUUID().toString(), "test"));
+        AuthData newAuth = authDao.createAuth(new AuthData(UUID.randomUUID().toString(), "test_user"));
         AuthData getAuth = authDao.getAuth(newAuth.authToken());
         assertNotNull(getAuth, "Should not return null");
         authDao.deleteAuth(newAuth.authToken());
@@ -78,20 +78,20 @@ public class AuthDAOTests {
 
     @Test
     void testGetUser() throws DataAccessException {
-        AuthData newAuth = authDao.createAuth(new AuthData(UUID.randomUUID().toString(), "test"));
+        AuthData newAuth = authDao.createAuth(new AuthData(UUID.randomUUID().toString(), "test_user"));
         String user = authDao.getUsername(newAuth.authToken());
-        assertEquals("test", user, "Username should match");
+        assertEquals("test_user", user, "Username should match");
     }
 
     @Test
     void testGetUserDNE() throws DataAccessException {
-        AuthData newAuth = authDao.createAuth(new AuthData(UUID.randomUUID().toString(), "test"));
+        AuthData newAuth = authDao.createAuth(new AuthData(UUID.randomUUID().toString(), "test_user"));
         String user = authDao.getUsername(newAuth.authToken());
         assertNotEquals("test1", user, "Username should not match");
     }
 
     @Test void testDeleteAll() throws DataAccessException {
-        AuthData newAuth = authDao.createAuth(new AuthData(UUID.randomUUID().toString(), "test"));
+        AuthData newAuth = authDao.createAuth(new AuthData(UUID.randomUUID().toString(), "test_user"));
         assert(!newAuth.authToken().isEmpty());
         authDao.deleteAll();
         assertNull(authDao.getAuth(newAuth.authToken()));

@@ -8,7 +8,7 @@ public class DatabaseManager {
     private static final String USER;
     private static final String PASSWORD;
     private static final String CONNECTION_URL;
-    private static final String temp_CONNECTION_URL;
+    private static final String TEMP_CONNECTION_URL;
 
     /*
      * Load the database information for the db.properties file.
@@ -27,7 +27,7 @@ public class DatabaseManager {
 
                 var host = props.getProperty("db.host");
                 var port = Integer.parseInt(props.getProperty("db.port"));
-                temp_CONNECTION_URL = String.format("jdbc:mysql://%s:%d/?useSSL=false&allowPublicKeyRetrieval=true", host, port);
+                TEMP_CONNECTION_URL = String.format("jdbc:mysql://%s:%d/?useSSL=false&allowPublicKeyRetrieval=true", host, port);
 
                 createDatabase();
                 CONNECTION_URL = String.format("jdbc:mysql://%s:%d/%s?useSSL=false&allowPublicKeyRetrieval=true", host, port, DATABASE_NAME);
@@ -43,7 +43,7 @@ public class DatabaseManager {
     public static void createDatabase() {
         try {
             var statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
-            var conn = DriverManager.getConnection(temp_CONNECTION_URL, USER, PASSWORD);
+            var conn = DriverManager.getConnection(TEMP_CONNECTION_URL, USER, PASSWORD);
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
             }

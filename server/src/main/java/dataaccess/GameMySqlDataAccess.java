@@ -47,7 +47,11 @@ public class GameMySqlDataAccess implements GameAccess{
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 try (var rs = preparedStatement.executeQuery()) {
                     while (rs.next()) {
-                        GameData game = new GameData(rs.getInt("gameID"), rs.getString("whiteUserID"), rs.getString("blackUserID"), rs.getString("gameName"), null);
+                        GameData game = new GameData(rs.getInt("gameID"),
+                                rs.getString("whiteUserID"),
+                                rs.getString("blackUserID"),
+                                rs.getString("gameName"),
+                                null);
                         gamesLists.add(new GamesList(game));
                     }
 

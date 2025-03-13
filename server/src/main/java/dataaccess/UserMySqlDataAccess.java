@@ -14,23 +14,25 @@ public class UserMySqlDataAccess implements UserAccess {
 
     public UserData getUser(String username, String password) throws DataAccessException {
         String statement = "SELECT username, email, password FROM users WHERE username = ?";
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.setString(1, username);
-                try (var rs = preparedStatement.executeQuery()) {
-                    if (rs.next()) {
-                        String hashedPassword = rs.getString("password");
-                        if (BCrypt.checkpw(password, hashedPassword)) {
-                            return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
-                        } else {return null;}
-                    } else {return null;}
 
-                } catch (SQLException e) {
-                    throw new DataAccessException(e.getMessage());
+        try (var conn = DatabaseManager.getConnection();
+             var preparedStatement = conn.prepareStatement(statement)) {
+
+            preparedStatement.setString(1, username);
+
+            try (var rs = preparedStatement.executeQuery()) {
+                if (!rs.next()) {
+                    return null;
                 }
-            } catch (SQLException e) {
-                throw new DataAccessException(e.getMessage());
+
+                String hashedPassword = rs.getString("password");
+                if (!BCrypt.checkpw(password, hashedPassword)) {
+                    return null;
+                }
+
+                return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
             }
+
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
@@ -92,7 +94,7 @@ public class UserMySqlDataAccess implements UserAccess {
                 }
             }
         } catch (SQLException | DataAccessException e) {
-            System.err.println("Failed to create tables: " + e.getMessage());
+            System.err.println("Failed to create tables for users: " + e.getMessage());
         }
     }
 }

@@ -119,7 +119,7 @@ public class AuthMySqlDataAccess implements AuthAccess{
                 }
             }
         } catch (SQLException | DataAccessException e) {
-            System.err.println("Failed to create tables: " + e.getMessage());
+            System.err.println("Failed to create tables for auths: " + e.getMessage());
         }
     }
 }

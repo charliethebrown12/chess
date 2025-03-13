@@ -26,9 +26,9 @@ public class UserDAOTests {
 
     @Test
     void testCreateUserSuccess() throws DataAccessException {
-        UserData user = userDao.createUser("test", "password", "test@gmail.com");
+        UserData user = userDao.createUser("test_user", "password", "test@gmail.com");
         assertNotNull(user, "User should not be null");
-        assertEquals("test", user.username(), "Username should match");
+        assertEquals("test_user", user.username(), "Usernames should match");
         assertEquals("test@gmail.com", user.email(), "Email should match");
     }
 
