@@ -1,7 +1,5 @@
 package client;
 
-import exception.ResponseException;
-
 import java.util.Scanner;
 
 import static java.awt.Color.*;
@@ -13,8 +11,8 @@ public class PostLoginRepl {
         this.client = client;
     }
 
-    public void run() throws ResponseException {
-        System.out.println("Logged in successfully");
+    public void run() {
+        System.out.println("\nLogged in successfully");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
@@ -25,7 +23,7 @@ public class PostLoginRepl {
 
             try {
                 result = client.eval(line);
-                System.out.print(RED + result);
+                System.out.print(result);
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -35,6 +33,6 @@ public class PostLoginRepl {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + ">>> " + GREEN);
+        System.out.print("\n" + "[LOGGED_IN] >>> ");
     }
 }

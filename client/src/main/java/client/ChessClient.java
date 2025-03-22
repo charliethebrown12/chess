@@ -26,9 +26,9 @@ public class ChessClient {
                 case "register" -> register(params);
                 case "login" -> login(params);
                 case "logout" -> logout();
-                case "listgames" -> listGames();
-                case "creategame" -> createGame(params);
-                case "joingame" -> joinGame(params);
+                case "list" -> listGames();
+                case "create" -> createGame(params);
+                case "join" -> joinGame(params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -99,8 +99,8 @@ public class ChessClient {
                 }
                 server.joinGame(authData, gameID, color);
                 return String.format("Joined game '%d' as %s.", gameID, username);
-            } catch (ResponseException e) {
-                throw new ResponseException(400, e.getMessage());
+            } catch (NumberFormatException e) {
+                throw new ResponseException(400, "<ID> must be a number.");
             }
         }
         throw new ResponseException(400, "Expected: join <ID> <WHITE|BLACK>");
@@ -109,7 +109,7 @@ public class ChessClient {
     public String help() {
         if (state == State.SIGNEDOUT) {
             return """
-                    - reigster <USERNAME> <PASSWORD> <EMAIL> - to create an account
+                    - register <USERNAME> <PASSWORD> <EMAIL> - to create an account
                     - login <USERNAME> <PASSWORD> - to play a game
                     - quit - exists program
                     - help - lists possible commands
@@ -130,5 +130,9 @@ public class ChessClient {
         if (state == State.SIGNEDOUT) {
             throw new ResponseException(400, "You must sign in");
         }
+    }
+
+    public boolean isSignedIn() {
+        return state == State.SIGNEDIN;
     }
 }
