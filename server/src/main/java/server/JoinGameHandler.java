@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.AuthMySqlDataAccess;
 import dataaccess.GameMySqlDataAccess;
 import model.ErrorData;
+import model.JoinGameRequest;
 import service.AuthService;
 import service.GameService;
 import spark.Request;
