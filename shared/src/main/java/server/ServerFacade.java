@@ -20,14 +20,16 @@ public class ServerFacade {
     }
 
 
-    public AuthData register(UserData user) throws ResponseException {
+    public AuthData register(String username, String password, String email) throws ResponseException {
         var path = "/user";
+        UserData user = new UserData(username, password, email);
         String responseJson = makeRequest("POST", path, user, null);
         return gson.fromJson(responseJson, AuthData.class);
     }
 
-    public AuthData login(UserData user) throws ResponseException {
+    public AuthData login(String username, String password) throws ResponseException {
         var path = "/session";
+        UserData user = new UserData(username, password, null);
         String responseJson = makeRequest("POST", path, user, null);
         return gson.fromJson(responseJson, AuthData.class);
     }
@@ -37,9 +39,9 @@ public class ServerFacade {
         makeRequest("DELETE", path, null, authData.authToken());
     }
 
-    public int createGame(AuthData authData) throws ResponseException {
+    public int createGame(AuthData authData, String gameName) throws ResponseException {
         var path = "/game";
-        String responseJson = makeRequest("POST", path, null, authData.authToken());
+        String responseJson = makeRequest("POST", path, gameName, authData.authToken());
         return gson.fromJson(responseJson, Integer.class);
     }
 
