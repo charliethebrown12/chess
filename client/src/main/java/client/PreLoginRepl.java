@@ -23,7 +23,7 @@ public class PreLoginRepl {
 
             try {
                 result = client.eval(line);
-                System.out.print(result);
+                System.out.print(result + "\n");
                 if (client.isSignedIn()) {
                     new PostLoginRepl(client).run();
                     break;

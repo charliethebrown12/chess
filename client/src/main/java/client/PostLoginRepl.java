@@ -12,7 +12,7 @@ public class PostLoginRepl {
     }
 
     public void run() {
-        System.out.println("\nLogged in successfully");
+        System.out.println("Logged in successfully");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
@@ -23,7 +23,7 @@ public class PostLoginRepl {
 
             try {
                 result = client.eval(line);
-                System.out.print(result);
+                System.out.print(result + "\n");
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
