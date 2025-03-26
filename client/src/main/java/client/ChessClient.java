@@ -1,8 +1,8 @@
 package client;
 
 import java.util.Arrays;
-
-import com.google.gson.Gson;
+import java.util.HashMap;
+import java.util.Map;
 import exception.ResponseException;
 import model.AuthData;
 import server.ServerFacade;
@@ -13,6 +13,7 @@ public class ChessClient {
     private State state = State.SIGNEDOUT;
     private AuthData authData;
     private String userColor;
+    private Map<Integer, Integer> gameNumberMapping;
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -30,6 +31,7 @@ public class ChessClient {
                 case "list" -> listGames();
                 case "create" -> createGame(params);
                 case "join" -> joinGame(params);
+                case "observe" -> watchGame(params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -74,11 +76,27 @@ public class ChessClient {
         if (games == null) {
             return "There are no games in this server.";
         }
-        var gson = new Gson();
-        var result = new StringBuilder();
+        var result = new StringBuilder("Available Games:\n");
+        Map<Integer, Integer> gameNumberMap = new HashMap<>(); // Maps display numbers to actual game IDs
+        int displayNum = 1;
+
         for (var game : games) {
-            result.append(gson.toJson(game)).append("\n");
+            gameNumberMap.put(displayNum, game.gameID()); // Store mapping
+            result.append(displayNum)
+                    .append(". ")
+                    .append(game.gameName())
+                    .append(" (Players: ")
+                    .append(" WhiteUsername - ")
+                    .append(game.whiteUsername() != null ? game.whiteUsername() : "Empty")
+                    .append(" vs ")
+                    .append(" BlackUsername - ")
+                    .append(game.blackUsername() != null ? game.blackUsername() : "Empty")
+                    .append(")\n");
+            displayNum++;
         }
+
+        // Store the mapping for later use when joining a game
+        this.gameNumberMapping = gameNumberMap;
         return result.toString();
     }
 
@@ -86,8 +104,8 @@ public class ChessClient {
         assertSignedIn();
         if (params.length == 1) {
             var gameName = params[0];
-            int gameID = server.createGame(authData, gameName);
-            return String.format("Created game '%s' with gameID %d.", gameName, gameID);
+            server.createGame(authData, gameName);
+            return String.format("Created game '%s'", gameName);
         }
         throw new ResponseException(400, "Expected: create <GAME NAME>");
     }
@@ -96,7 +114,11 @@ public class ChessClient {
         assertSignedIn();
         if (params.length == 2) {
             try {
-                int gameID = Integer.parseInt(params[0]);
+                int displayID = Integer.parseInt(params[0]);
+                if (!gameNumberMapping.containsKey(displayID)) {
+                    throw new ResponseException(400, "GameID does not exist.");
+                }
+                int gameID = gameNumberMapping.get(displayID);
                 var color = params[1].toUpperCase();
                 if (!color.equals("WHITE") && !color.equals("BLACK")) {
                     throw new ResponseException(400, "Expected: <gameID> <WHITE|BLACK>");
@@ -104,12 +126,21 @@ public class ChessClient {
                 server.joinGame(authData, gameID, color);
                 state = State.INGAME;
                 userColor = color;
-                return String.format("Joined game '%d' as %s.", gameID, username);
+                return String.format("Joined game '%d' as %s.", displayID, username);
             } catch (NumberFormatException e) {
                 throw new ResponseException(400, "<ID> must be a number.");
             }
         }
         throw new ResponseException(400, "Expected: join <ID> <WHITE|BLACK>");
+    }
+
+    public String watchGame(String... params) throws ResponseException {
+        if (params.length == 1) {
+            userColor = "WHITE";
+            state = State.INGAME;
+            return String.format("Watching game '%s' as an observer", params[0]);
+        }
+        throw new ResponseException(400, "Expected: observe <ID>");
     }
 
     public void printBoard() {
@@ -153,7 +184,7 @@ public class ChessClient {
                 String pieceColor = (row < 2) ? "\u001B[31m" : (row > 5) ? "\u001B[34m" : "\u001B[0m";
                 String piece = board[row][col].equals(" ") ? " " : pieceColor + board[row][col] + "\u001B[0m";
 
-                System.out.print(squareColor + piece + " " + "\u001B[0m");
+                System.out.print(squareColor + piece + "\u2003" + "\u001B[0m");
             }
 
             System.out.println(" " + (8 - row));
@@ -175,7 +206,7 @@ public class ChessClient {
                 - create <GAME NAME> - creates a game
                 - list - shows the list of all games
                 - join <ID> <WHITE|BLACK> - joins a game
-                - watch <ID> - watches a game
+                - observe <ID> - watches a game
                 - logout - logs out player
                 - quit - exits program
                 - help - lists possible commands
