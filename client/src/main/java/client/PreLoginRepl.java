@@ -7,6 +7,8 @@ import static java.awt.Color.*;
 public class PreLoginRepl {
     private final ChessClient client;
 
+    public PreLoginRepl(ChessClient client) {this.client = client;}
+
     public PreLoginRepl(String serverUrl) {
         client = new ChessClient(serverUrl);
     }

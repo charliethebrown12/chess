@@ -24,6 +24,10 @@ public class PostLoginRepl {
             try {
                 result = client.eval(line);
                 System.out.print(result + "\n");
+                if (!client.isSignedIn()) {
+                    new PreLoginRepl(client).run();
+                    break;
+                }
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);

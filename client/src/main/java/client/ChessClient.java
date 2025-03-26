@@ -70,6 +70,9 @@ public class ChessClient {
     public String listGames() throws ResponseException {
         assertSignedIn();
         var games = server.listGames(authData);
+        if (games == null) {
+            return "There are no games in this server.";
+        }
         var gson = new Gson();
         var result = new StringBuilder();
         for (var game : games) {

@@ -29,6 +29,7 @@ public class CreateGameHandler {
                 return new Gson().toJson((new ErrorData("Error: User is not authorized. Please login")));
             }
             int gameID = gameService.createGame(newGame.gameName());
+            System.out.println("Returning JSON: " + new Gson().toJson(Map.of("gameID", gameID)));
             return new Gson().toJson(Map.of("gameID", gameID));
 
         } catch (Exception e) {

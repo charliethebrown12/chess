@@ -1,14 +1,13 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import exception.ResponseException;
-import model.AuthData;
-import model.UserData;
-import model.GameData;
-import model.JoinGameRequest;
+import model.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.Map;
 
 public class ServerFacade {
 
@@ -41,20 +40,23 @@ public class ServerFacade {
 
     public int createGame(AuthData authData, String gameName) throws ResponseException {
         var path = "/game";
-        String responseJson = makeRequest("POST", path, gameName, authData.authToken());
-        return gson.fromJson(responseJson, Integer.class);
+        Map<String, String> request = Map.of("gameName", gameName);
+        String responseJson = makeRequest("POST", path, request, authData.authToken());
+        JsonObject json = gson.fromJson(responseJson, JsonObject.class);
+        return json.get("gameID").getAsInt();
     }
 
     public GameData[] listGames(AuthData authData) throws ResponseException {
         var path = "/game";
         String responseJson = makeRequest("GET", path, null, authData.authToken());
-        return gson.fromJson(responseJson, GameData[].class);
+
+        return gson.fromJson(responseJson, ListGamesResponse.class).games();
     }
 
     public void joinGame(AuthData authData, int gameID, String playerColor) throws ResponseException {
         var path = "/game";
         var request = new JoinGameRequest(gameID, playerColor);
-        makeRequest("POST", path, request, authData.authToken());
+        makeRequest("PUT", path, request, authData.authToken());
     }
 
     public void deleteAll() throws ResponseException {
@@ -69,14 +71,18 @@ public class ServerFacade {
             http.setRequestMethod(method);
             http.setDoOutput(true);
             if (authToken != null) {
-                http.setRequestProperty("Authorization", "Bearer " + authToken);
+                http.setRequestProperty("Authorization", authToken);
             }
 
-            OutputStream os = http.getOutputStream();
-            os.write(gson.toJson(request).getBytes());
+            if (request != null) {
+                OutputStream os = http.getOutputStream();
+                os.write(gson.toJson(request).getBytes());
+                System.out.println(os);
+            }
 
             http.connect();
             throwIfNotSuccessful(http);
+            http.getResponseMessage();
             return readBody(http);
         } catch (ResponseException ex) {
             throw ex;
@@ -88,19 +94,17 @@ public class ServerFacade {
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
-            try (InputStream respErr = http.getErrorStream()) {
-                if (respErr != null) {
-                    throw ResponseException.fromJson(respErr);
-                }
-            }
-
-            throw new ResponseException(status, "other failure: " + status);
+            String errorJson = readBody(http);
+            ErrorData errorData = gson.fromJson(errorJson, ErrorData.class);
+            throw new ResponseException(status, errorData.message());
         }
     }
 
     private String readBody(HttpURLConnection http) throws IOException {
         try (InputStream respBody = http.getInputStream()) {
-            return new String(respBody.readAllBytes());
+            String response = new String(respBody.readAllBytes());
+            System.out.println(response);
+            return response;
         }
     }
 
