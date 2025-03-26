@@ -77,12 +77,10 @@ public class ServerFacade {
             if (request != null) {
                 OutputStream os = http.getOutputStream();
                 os.write(gson.toJson(request).getBytes());
-                System.out.println(os);
             }
 
             http.connect();
             throwIfNotSuccessful(http);
-            http.getResponseMessage();
             return readBody(http);
         } catch (ResponseException ex) {
             throw ex;
@@ -95,16 +93,34 @@ public class ServerFacade {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
             String errorJson = readBody(http);
-            ErrorData errorData = gson.fromJson(errorJson, ErrorData.class);
-            throw new ResponseException(status, errorData.message());
+            String errorMessage = "An unexpected error has occurred.";
+            if (!errorJson.isEmpty()) {
+                try {
+                    ErrorData errorData = gson.fromJson(errorJson, ErrorData.class);
+                    if (errorData != null && errorData.message() != null) {
+                        errorMessage = errorData.message();
+                    }
+                } catch (Exception e) {
+                    errorMessage = "Failed to get server error.";
+                }
+
+            }
+            throw new ResponseException(status, errorMessage);
         }
     }
 
     private String readBody(HttpURLConnection http) throws IOException {
-        try (InputStream respBody = http.getInputStream()) {
-            String response = new String(respBody.readAllBytes());
-            System.out.println(response);
-            return response;
+        InputStream stream;
+        if (http.getResponseCode() >= 400) {
+            stream = http.getErrorStream();
+        } else {
+            stream = http.getInputStream();
+        }
+
+        if (stream == null) return "";
+
+        try (stream) {
+            return new String(stream.readAllBytes());
         }
     }
 

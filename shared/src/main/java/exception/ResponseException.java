@@ -16,7 +16,7 @@ public class ResponseException extends Exception {
     }
 
     public String toJson() {
-        return new Gson().toJson(Map.of("message", getMessage(), "status", statusCode));
+        return new Gson().toJson(Map.of("message", getMessage()));
     }
 
     public static ResponseException fromJson(InputStream stream) {
@@ -24,9 +24,5 @@ public class ResponseException extends Exception {
         var status = ((Double)map.get("status")).intValue();
         String message = map.get("message").toString();
         return new ResponseException(status, message);
-    }
-
-    public int StatusCode() {
-        return statusCode;
     }
 }
