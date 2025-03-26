@@ -117,7 +117,9 @@ public class ServerFacade {
             stream = http.getInputStream();
         }
 
-        if (stream == null) return "";
+        if (stream == null) {
+            return "";
+        }
 
         try (stream) {
             return new String(stream.readAllBytes());
