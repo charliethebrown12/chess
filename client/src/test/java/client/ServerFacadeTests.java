@@ -43,9 +43,7 @@ public class ServerFacadeTests {
     @Test
     public void registerFail() throws ResponseException {
         facade.register("test1", "testpassword", "test@email");
-        assertThrows(ResponseException.class, () -> {
-            facade.register("test1", "testpassword", "test@email");
-        });
+        assertThrows(ResponseException.class, () -> facade.register("test1", "testpassword", "test@email"));
     }
 
     @Test
@@ -58,26 +56,20 @@ public class ServerFacadeTests {
     @Test
     public void loginFail() throws ResponseException {
         facade.register("test1", "testpassword", "test@email");
-        assertThrows(ResponseException.class, () -> {
-            facade.login("test1", "cheese");
-        });
+        assertThrows(ResponseException.class, () -> facade.login("test1", "cheese"));
     }
 
     @Test
     public void logoutSuccess() throws ResponseException {
         var authData = facade.register("test1", "testpassword", "test@email");
         facade.logout(authData);
-        assertThrows(ResponseException.class, () -> {
-            facade.logout(authData);
-        });
+        assertThrows(ResponseException.class, () -> facade.logout(authData));
     }
 
     @Test
-    public void logoutFail() throws ResponseException {
+    public void logoutFail() {
         AuthData authData = new AuthData("BADAUTHTOKEN", "test1");
-        assertThrows(ResponseException.class, () -> {
-            facade.logout(authData);
-        });
+        assertThrows(ResponseException.class, () -> facade.logout(authData));
     }
 
     @Test
@@ -88,11 +80,9 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void createGameFail() throws ResponseException {
+    public void createGameFail() {
         AuthData authData = new AuthData("BADAUTHTOKEN", "test1");
-        assertThrows(ResponseException.class, () -> {
-            facade.createGame(authData, "testgame");
-        });
+        assertThrows(ResponseException.class, () -> facade.createGame(authData, "testgame"));
     }
 
     @Test
@@ -103,11 +93,9 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void listGamesFail() throws ResponseException {
+    public void listGamesFail() {
         AuthData authData = new AuthData("BADAUTHTOKEN", "test1");
-        assertThrows(ResponseException.class, () -> {
-            facade.listGames(authData);
-        });
+        assertThrows(ResponseException.class, () -> facade.listGames(authData));
     }
 
     @Test
@@ -124,17 +112,13 @@ public class ServerFacadeTests {
     @Test
     public void joinGameFail() throws ResponseException {
         var authData = facade.register("test1", "testpassword", "test@email");
-        assertThrows(ResponseException.class, () -> {
-            facade.joinGame(authData, 1, "WHITE");
-        });
+        assertThrows(ResponseException.class, () -> facade.joinGame(authData, 1, "WHITE"));
     }
 
     @Test
     public void deleteAllSuccess() throws ResponseException {
         facade.register("test1", "testpassword", "test@email");
         facade.deleteAll();
-        assertThrows(ResponseException.class, () -> {
-            facade.login("test1", "testpassword");
-        });
+        assertThrows(ResponseException.class, () -> facade.login("test1", "testpassword"));
     }
 }

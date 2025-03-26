@@ -2,8 +2,6 @@ package client;
 
 import java.util.Scanner;
 
-import static java.awt.Color.*;
-
 public class PreLoginRepl {
     private final ChessClient client;
 

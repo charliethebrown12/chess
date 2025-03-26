@@ -2,8 +2,6 @@ package client;
 
 import java.util.Scanner;
 
-import static java.awt.Color.*;
-
 public class GameplayRepl {
     private final ChessClient client;
 
