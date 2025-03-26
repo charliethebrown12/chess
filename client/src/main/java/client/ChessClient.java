@@ -12,6 +12,7 @@ public class ChessClient {
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
     private AuthData authData;
+    private String userColor;
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -101,12 +102,64 @@ public class ChessClient {
                     throw new ResponseException(400, "Expected: <gameID> <WHITE|BLACK>");
                 }
                 server.joinGame(authData, gameID, color);
+                state = State.INGAME;
+                userColor = color;
                 return String.format("Joined game '%d' as %s.", gameID, username);
             } catch (NumberFormatException e) {
                 throw new ResponseException(400, "<ID> must be a number.");
             }
         }
         throw new ResponseException(400, "Expected: join <ID> <WHITE|BLACK>");
+    }
+
+    public void printBoard() {
+        String[][] board = {
+                {"♖", "♘", "♗", "♕", "♔", "♗", "♘", "♖"},
+                {"♙", "♙", "♙", "♙", "♙", "♙", "♙", "♙"},
+                {" ", " ", " ", " ", " ", " ", " ", " "},
+                {" ", " ", " ", " ", " ", " ", " ", " "},
+                {" ", " ", " ", " ", " ", " ", " ", " "},
+                {" ", " ", " ", " ", " ", " ", " ", " "},
+                {"♟", "♟", "♟", "♟", "♟", "♟", "♟", "♟"},
+                {"♜", "♞", "♝", "♛", "♚", "♝", "♞", "♜"}
+        };
+        boolean isWhitePlayer = userColor.equals("WHITE");
+
+        String columns;
+        if (isWhitePlayer) {
+            columns = "  a b c d e f g h";
+        } else {
+            columns = "  h g f e d c b a";
+        }
+        System.out.println(columns);
+
+        for (int i = 0; i < 8; i++) {
+            int row;
+            if (isWhitePlayer) {
+                row = i;
+            } else {
+                row = 7 - i;
+            }
+            System.out.print((8 - row) + " ");
+
+            for (int j = 0; j < 8; j++) {
+                int col;
+                if (isWhitePlayer) {
+                    col = 7 - j;
+                } else {
+                    col = j;
+                }
+                String squareColor = ((row + col) % 2 == 0) ? "\u001B[100m" : "\u001B[40m";
+                String pieceColor = (row < 2) ? "\u001B[31m" : (row > 5) ? "\u001B[34m" : "\u001B[0m";
+                String piece = board[row][col].equals(" ") ? " " : pieceColor + board[row][col] + "\u001B[0m";
+
+                System.out.print(squareColor + piece + " " + "\u001B[0m");
+            }
+
+            System.out.println(" " + (8 - row));
+        }
+
+        System.out.println(columns); // Column labels at the bottom
     }
 
     public String help() {
@@ -138,4 +191,6 @@ public class ChessClient {
     public boolean isSignedIn() {
         return state == State.SIGNEDIN;
     }
+
+    public boolean isInGame() { return state == State.INGAME; }
 }

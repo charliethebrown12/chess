@@ -24,6 +24,10 @@ public class PostLoginRepl {
             try {
                 result = client.eval(line);
                 System.out.print(result + "\n");
+                if (client.isInGame()) {
+                    new GameplayRepl(client).run();
+                    break;
+                }
                 if (!client.isSignedIn()) {
                     new PreLoginRepl(client).run();
                     break;
