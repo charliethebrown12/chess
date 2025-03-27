@@ -44,7 +44,6 @@ public class GameService {
                 gameAccess.deleteGame(gameID);
                 gameAccess.addGame(updateGame);
             } else {
-                gameAccess.addGame(game);
                 throw new DataAccessException("That color is already in use by another player");
             }
         }

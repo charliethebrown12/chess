@@ -32,7 +32,7 @@ public class GameMySqlDataAccess implements GameAccess{
                     } else {throw new DataAccessException("Game creation failed, no ID obtained");}
                 }
             } catch (SQLException e) {
-                throw new DataAccessException("Game creation failed " + e.getMessage());
+                throw new DataAccessException("Game creation failed ");
             }
 
         } catch (SQLException e) {
@@ -126,7 +126,7 @@ public class GameMySqlDataAccess implements GameAccess{
                     throw new DataAccessException("No rows affected, game not created");
                 }
             } catch (SQLException e) {
-                throw new DataAccessException("Game creation failed " + e.getMessage());
+                throw new DataAccessException("Game creation failed ");
             }
 
         } catch (SQLException e) {
