@@ -29,20 +29,22 @@ public class GameService {
         GameData game = gameAccess.joinGame(gameID);
         String whiteUsername = game.whiteUsername();
         String blackUsername = game.blackUsername();
-        gameAccess.deleteGame(gameID);
-        GameData updateGame;
         if (Objects.equals(playerColor, "WHITE")) {
-            if (whiteUsername == null) {
-                updateGame = new GameData(game.gameID(), user, game.blackUsername(), game.gameName(), game.game());
+            if (whiteUsername == null || whiteUsername.isEmpty()) {
+                GameData updateGame = new GameData(game.gameID(), user, game.blackUsername(), game.gameName(), game.game());
+                gameAccess.deleteGame(gameID);
                 gameAccess.addGame(updateGame);
+            } else {
+                throw new DataAccessException("That color is already in use by another player");
             }
         }
         else if (Objects.equals(playerColor, "BLACK")) {
-            if (blackUsername == null) {
-                updateGame = new GameData(game.gameID(), game.whiteUsername(), user, game.gameName(), game.game());
+            if (blackUsername == null || blackUsername.isEmpty()) {
+                GameData updateGame = new GameData(game.gameID(), game.whiteUsername(), user, game.gameName(), game.game());
+                gameAccess.deleteGame(gameID);
                 gameAccess.addGame(updateGame);
-            }
-            else {
+            } else {
+                gameAccess.addGame(game);
                 throw new DataAccessException("That color is already in use by another player");
             }
         }

@@ -59,12 +59,14 @@ public class GameServiceTest {
     }
 
     @Test
-    void testJoinGameFailure() {
+    void testJoinGameFailure() throws DataAccessException {
+        int gameID = gameService.createGame("test");
+        gameService.joinGame(gameID, "WHITE", "testUser");
         DataAccessException exception = assertThrows(DataAccessException.class, () ->
-                gameService.joinGame(1, "BLACK", "testUser")
+                gameService.joinGame(gameID, "WHITE", "test")
         );
 
-        assertEquals("Game ID does not exist.", exception.getMessage());
+        assertEquals("That color is already in use by another player", exception.getMessage());
     }
 
     @Test void testDeleteAll() throws DataAccessException {

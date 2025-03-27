@@ -115,7 +115,7 @@ public class ChessClient {
         if (params.length == 2) {
             try {
                 int displayID = Integer.parseInt(params[0]);
-                if (!gameNumberMapping.containsKey(displayID)) {
+                if (gameNumberMapping == null || !gameNumberMapping.containsKey(displayID)) {
                     throw new ResponseException(400, "GameID does not exist.");
                 }
                 int gameID = gameNumberMapping.get(displayID);
@@ -145,14 +145,14 @@ public class ChessClient {
 
     public void printBoard() {
         String[][] board = {
-                {"♖", "♘", "♗", "♕", "♔", "♗", "♘", "♖"},
+                {"♖", "♘", "♗", "♔", "♕", "♗", "♘", "♖"},
                 {"♙", "♙", "♙", "♙", "♙", "♙", "♙", "♙"},
                 {" ", " ", " ", " ", " ", " ", " ", " "},
                 {" ", " ", " ", " ", " ", " ", " ", " "},
                 {" ", " ", " ", " ", " ", " ", " ", " "},
                 {" ", " ", " ", " ", " ", " ", " ", " "},
                 {"♟", "♟", "♟", "♟", "♟", "♟", "♟", "♟"},
-                {"♜", "♞", "♝", "♛", "♚", "♝", "♞", "♜"}
+                {"♜", "♞", "♝", "♚", "♛", "♝", "♞", "♜"}
         };
         boolean isWhitePlayer = userColor.equals("WHITE");
 
@@ -180,8 +180,8 @@ public class ChessClient {
                 } else {
                     col = j;
                 }
-                String squareColor = ((row + col) % 2 == 0) ? "\u001B[100m" : "\u001B[40m";
-                String pieceColor = (row < 2) ? "\u001B[31m" : (row > 5) ? "\u001B[34m" : "\u001B[0m";
+                String squareColor = ((row + col) % 2 == 0) ? "\u001B[40m" : "\u001B[100m";
+                String pieceColor = (row < 2) ? "\u001B[32m" : (row > 5) ? "\u001B[34m" : "\u001B[0m";
                 String piece = board[row][col].equals(" ") ? " " : pieceColor + board[row][col] + "\u001B[0m";
 
                 System.out.print(squareColor + piece + "\u2003" + "\u001B[0m");
