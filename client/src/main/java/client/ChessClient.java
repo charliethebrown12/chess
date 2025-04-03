@@ -32,6 +32,11 @@ public class ChessClient {
                 case "create" -> createGame(params);
                 case "join" -> joinGame(params);
                 case "observe" -> watchGame(params);
+                case "redraw" -> redrawBoard();
+                case "leave" -> leaveGame();
+                case "makemove" -> makeMove(params);
+                case "resign" -> resignGame();
+                case "highlight" -> highlightMoves(params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -39,6 +44,7 @@ public class ChessClient {
             return ex.getMessage();
         }
     }
+
 
     public String register(String... params) throws ResponseException {
         if (params.length == 3) {
@@ -158,9 +164,9 @@ public class ChessClient {
 
         String columns;
         if (isWhitePlayer) {
-            columns = "  a b c d e f g h";
+            columns = "   a  b  c  d  e  f  g  h";
         } else {
-            columns = "  h g f e d c b a";
+            columns = "   h  g  f  e  d  c  b  a";
         }
         System.out.println(columns);
 
@@ -182,9 +188,9 @@ public class ChessClient {
                 }
                 String squareColor = ((row + col) % 2 == 0) ? "\u001B[40m" : "\u001B[100m";
                 String pieceColor = (row < 2) ? "\u001B[32m" : (row > 5) ? "\u001B[34m" : "\u001B[0m";
-                String piece = board[row][col].equals(" ") ? " " : pieceColor + board[row][col] + "\u001B[0m";
+                String piece = board[row][col].equals(" ") ? "\u2003" + "  " : "\u2003" + pieceColor + board[row][col] + "\u2003";
 
-                System.out.print(squareColor + piece + "\u2003" + "\u001B[0m");
+                System.out.print(squareColor + piece + "\u001B[0m");
             }
 
             System.out.println(" " + (8 - row));
@@ -221,6 +227,10 @@ public class ChessClient {
 
     public boolean isSignedIn() {
         return state == State.SIGNEDIN;
+    }
+
+    public void quitGame() {
+        state = State.SIGNEDIN;
     }
 
     public boolean isInGame() { return state == State.INGAME; }

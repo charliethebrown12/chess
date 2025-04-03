@@ -16,6 +16,11 @@ public class GameplayRepl {
             client.printBoard();
             printPrompt();
             result = scanner.nextLine();
+            if (result.equals("leave")) {
+                client.quitGame();
+                new PostLoginRepl(client).run();
+                break;
+            }
         }
 
 
