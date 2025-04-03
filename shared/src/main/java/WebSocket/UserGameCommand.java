@@ -11,13 +11,9 @@ import java.util.Objects;
  * methods.
  */
 public class UserGameCommand {
-
     private final CommandType commandType;
-
     private final String authToken;
-
     private final Integer gameID;
-
     private final ChessMove move;
 
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID, ChessMove move) {

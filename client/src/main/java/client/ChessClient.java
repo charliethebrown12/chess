@@ -3,6 +3,9 @@ package client;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import WebSocket.UserGameCommand;
+import chess.ChessGame;
 import exception.ResponseException;
 import model.AuthData;
 import server.ServerFacade;
@@ -14,6 +17,9 @@ public class ChessClient {
     private AuthData authData;
     private String userColor;
     private Map<Integer, Integer> gameNumberMapping;
+    private int gameID;
+    private WebSocketCommunicator websocket;
+    private ChessGame game;
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -124,12 +130,17 @@ public class ChessClient {
                 if (gameNumberMapping == null || !gameNumberMapping.containsKey(displayID)) {
                     throw new ResponseException(400, "GameID does not exist.");
                 }
-                int gameID = gameNumberMapping.get(displayID);
+                gameID = gameNumberMapping.get(displayID);
                 var color = params[1].toUpperCase();
                 if (!color.equals("WHITE") && !color.equals("BLACK")) {
                     throw new ResponseException(400, "Expected: <gameID> <WHITE|BLACK>");
                 }
                 server.joinGame(authData, gameID, color);
+
+                websocket = new WebsocketHandler(serverUrl, this);
+                websocket.connect();
+                UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authData.authToken(), gameID);
+                websocket.send(command);
                 state = State.INGAME;
                 userColor = color;
                 return String.format("Joined game '%d' as %s.", displayID, username);
@@ -199,6 +210,24 @@ public class ChessClient {
         System.out.println(columns); // Column labels at the bottom
     }
 
+    public String redrawBoard() throws ResponseException {
+        assertInGame();
+        printBoard();
+        return "Board redrawn";
+    }
+
+    public String leaveGame() throws ResponseException {
+        assertInGame();
+        UserGameCommand command = new UserGameCommand();
+        command.commandType = UserGameCommand.CommandType.LEAVE;
+        command.authToken = authData.authToken();
+        command.gameID = gameID;
+
+        websocket.send(command);
+        quitGame();
+        websocket.close();
+    }
+
     public String help() {
         if (state == State.SIGNEDOUT) {
             return """
@@ -206,6 +235,15 @@ public class ChessClient {
                     - login <USERNAME> <PASSWORD> - to play a game
                     - quit - exists program
                     - help - lists possible commands
+                    """;
+        }
+        if (state == State.INGAME) {
+            return """
+                    - redraw - redraws the game board
+                    - leave - leaves the current game
+                    - makemove <MOVE> - implements a move in the game
+                    - resign - leaves the game and causes game to end
+                    - highlight <POSITION> - highlights possible moves for piece at given position
                     """;
         }
         return """
@@ -222,6 +260,12 @@ public class ChessClient {
     private void assertSignedIn() throws ResponseException {
         if (state == State.SIGNEDOUT) {
             throw new ResponseException(400, "You must sign in");
+        }
+    }
+
+    private void assertInGame() throws ResponseException {
+        if (!(state == State.INGAME)) {
+            throw new ResponseException(400, "You must join a game");
         }
     }
 
