@@ -4,13 +4,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import WebSocket.UserGameCommand;
+import websocket.*;
 import chess.ChessGame;
 import exception.ResponseException;
 import model.AuthData;
 import server.ServerFacade;
 
-public class ChessClient {
+public class ChessClient implements ServerMessageObserver {
     private String username = null;
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
@@ -20,8 +20,10 @@ public class ChessClient {
     private int gameID;
     private WebSocketCommunicator websocket;
     private ChessGame game;
+    private final String serverUrl;
 
     public ChessClient(String serverUrl) {
+        this.serverUrl = serverUrl;
         server = new ServerFacade(serverUrl);
     }
 
@@ -137,8 +139,7 @@ public class ChessClient {
                 }
                 server.joinGame(authData, gameID, color);
 
-                websocket = new WebsocketHandler(serverUrl, this);
-                websocket.connect();
+                websocket = new WebSocketCommunicator(serverUrl, this);
                 UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authData.authToken(), gameID);
                 websocket.send(command);
                 state = State.INGAME;
@@ -152,6 +153,7 @@ public class ChessClient {
     }
 
     public String watchGame(String... params) throws ResponseException {
+        assertSignedIn();
         if (params.length == 1) {
             userColor = "WHITE";
             state = State.INGAME;
@@ -278,4 +280,9 @@ public class ChessClient {
     }
 
     public boolean isInGame() { return state == State.INGAME; }
+
+    @Override
+    public void notify(ServerMessage message) {
+
+    }
 }
