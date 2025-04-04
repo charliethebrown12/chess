@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import chess.ChessMove;
+import chess.ChessPosition;
 import websocket.*;
 import chess.ChessGame;
 import exception.ResponseException;
@@ -155,6 +157,14 @@ public class ChessClient implements ServerMessageObserver {
     public String watchGame(String... params) throws ResponseException {
         assertSignedIn();
         if (params.length == 1) {
+            try {
+                gameID = Integer.parseInt(params[0]);
+            } catch (NumberFormatException e) {
+                throw new ResponseException(400, "<ID> must be a number");
+            }
+            websocket = new WebSocketCommunicator(serverUrl, this);
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authData.authToken(), gameID);
+            websocket.send(command);
             userColor = "WHITE";
             state = State.INGAME;
             return String.format("Watching game '%s' as an observer", params[0]);
@@ -220,14 +230,48 @@ public class ChessClient implements ServerMessageObserver {
 
     public String leaveGame() throws ResponseException {
         assertInGame();
-        UserGameCommand command = new UserGameCommand();
-        command.commandType = UserGameCommand.CommandType.LEAVE;
-        command.authToken = authData.authToken();
-        command.gameID = gameID;
-
+        UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authData.authToken(), gameID);
         websocket.send(command);
         quitGame();
         websocket.close();
+        return "You have left the game";
+    }
+
+    public String makeMove(String... params) throws ResponseException {
+        assertInGame();
+        if (params.length != 2) {
+            throw new ResponseException(400, "Expected: makemove <STARTSQUARE> <ENDSQUARE>");
+        }
+        String start = params[0];
+        String end = params[1];
+        ChessPosition startPos = parseSquare(start, userColor);
+        ChessPosition endPos = parseSquare(end, userColor);
+        ChessMove move = new ChessMove(startPos, endPos, null);
+        UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authData.authToken(), gameID, move);
+        websocket.send(moveCommand);
+        return String.format("Move %s to %s send to server", start, end);
+    }
+
+    public String resignGame() throws ResponseException {
+        assertInGame();
+        UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authData.authToken(), gameID);
+        websocket.send(resign);
+        state = State.SIGNEDIN;
+        return "You have resigned the game";
+    }
+
+    public String highlightMoves(String... params) throws ResponseException {
+        assertInGame();
+        if (params.length != 1) {
+            throw new ResponseException(400, "Expected: highlight <SQUARE>");
+        }
+        String square = params[0];
+        ChessPosition position = parseSquare(square, userColor);
+        if (game == null) {
+            return "No game state available to highlight moves";
+        }
+        var legalMoves = game.validMoves(position);
+        return "Highlighted legal moves for piece at " + square + ": " + legalMoves;
     }
 
     public String help() {
@@ -281,8 +325,21 @@ public class ChessClient implements ServerMessageObserver {
 
     public boolean isInGame() { return state == State.INGAME; }
 
+    private ChessPosition parseSquare(String notation, String userColor) {
+        int col = notation.charAt(0) - 'a';
+        int row = 8 - Character.getNumericValue(notation.charAt(1));
+        return new ChessPosition(row, col);
+    }
+
     @Override
     public void notify(ServerMessage message) {
-
+        switch (message.getServerMessageType()) {
+            case LOAD_GAME -> {
+                this.game = message.getGame();
+                printBoard();
+            }
+            case ERROR -> System.out.println("Error from server: " + message.getErrorMessage());
+            case NOTIFICATION -> System.out.println("Notification: " + message.getNotification());
+        }
     }
 }
