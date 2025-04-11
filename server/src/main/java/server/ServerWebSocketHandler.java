@@ -2,6 +2,7 @@ package server;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPosition;
 import dataaccess.AuthMySqlDataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.GameMySqlDataAccess;
@@ -9,14 +10,15 @@ import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import service.GameManager;
-import websocket.ServerMessage;
-import websocket.UserGameCommand;
+import websocket.messages.ServerMessage;
+import websocket.commands.UserGameCommand;
 import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @WebSocket
@@ -24,6 +26,7 @@ public class ServerWebSocketHandler {
 
     private final Gson gson = new Gson();
     private static final Map<Integer, List<Session>> gameSessions = new ConcurrentHashMap<>();
+    private static final Set<Integer> endedGames = ConcurrentHashMap.newKeySet();
 
 
     @OnWebSocketConnect
@@ -42,20 +45,29 @@ public class ServerWebSocketHandler {
             try {
                 GameData gameData = new GameMySqlDataAccess().joinGame(gameID);
                 String username = new AuthMySqlDataAccess().getUsername(command.getAuthToken());
-
-                ServerMessage joinNotice = getServerMessage(username, gameData);
+                if (username == null) {
+                    ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+                    error.setErrorMessage("Error: Invalid auth token.");
+                    session.getRemote().sendString(gson.toJson(error));
+                    session.close();
+                    return;
+                }
+                ServerMessage joinNotice = getJoinNotice(username, gameData);
 
                 String notice = gson.toJson(joinNotice);
 
                 List<Session> sessions = gameSessions.getOrDefault(gameID, List.of());
                 for (Session s : sessions) {
-                    if (!s.equals(session) && s.isOpen()) { // send to everyone else
+                    if (!s.equals(session) && s.isOpen()) {
                         s.getRemote().sendString(notice);
                     }
                 }
-                ChessGame game = gameData.game();
+                ChessGame game = GameManager.getInstance().getGame(gameID);
 
-                GameManager.getInstance().updateGame(gameID, game);
+                if (game == null) {
+                    game = gameData.game();
+                    GameManager.getInstance().updateGame(gameID, game);
+                }
 
                 ServerMessage response = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
                 System.out.println("Sending LOAD_GAME for gameID: " + gameID);
@@ -72,9 +84,23 @@ public class ServerWebSocketHandler {
             }
         }
         else if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE) {
-            String username = new AuthMySqlDataAccess().getUsername(command.getAuthToken());
             int gameID = command.getGameID();
+            String username = new AuthMySqlDataAccess().getUsername(command.getAuthToken());
+            if (username == null) {
+                ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+                error.setErrorMessage("Error: Invalid auth token.");
+                session.getRemote().sendString(gson.toJson(error));
+                session.close();
+                return;
+            }
             GameData gameData = new GameMySqlDataAccess().joinGame(gameID);
+
+            if (endedGames.contains(gameID)) {
+                ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+                error.setErrorMessage("Game is already over.");
+                session.getRemote().sendString(gson.toJson(error));
+                return;
+            }
             boolean isPlayer = username.equals(gameData.whiteUsername()) || username.equals(gameData.blackUsername());
             if (!isPlayer) {
                 ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
@@ -83,7 +109,6 @@ public class ServerWebSocketHandler {
                 return;
             }
             ChessMove move = command.getMove();
-
             ChessGame game = GameManager.getInstance().getGame(gameID);
             if (game == null) {
                 System.err.println("No game found in memory for gameID " + gameID);
@@ -98,6 +123,10 @@ public class ServerWebSocketHandler {
 
 
                 broadcastGameState(gameID, game);
+                String moveNotation = moveToString(move);
+                String messageText = username + " moved " + moveNotation;
+                sendNotification(gameID, messageText, session);
+                gameNotifications(gameID, game);
 
             } catch (Exception e) {
                 System.err.println("Invalid move: " + e.getMessage());
@@ -109,10 +138,16 @@ public class ServerWebSocketHandler {
         else if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
             int gameID = command.getGameID();
             String authToken = command.getAuthToken();
-            GameManager.getInstance().removeGame(gameID); // if you're done with the game
+            GameManager.getInstance().removeGame(gameID);
 
-            // Notify all players
             String username = new AuthMySqlDataAccess().getUsername(authToken);
+            if (username == null) {
+                ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+                error.setErrorMessage("Error: Invalid auth token.");
+                session.getRemote().sendString(gson.toJson(error));
+                session.close();
+                return;
+            }
             String noticeText = username + " has resigned. Game over.";
             ServerMessage resignNotice = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
             resignNotice.setNotification(noticeText);
@@ -141,10 +176,18 @@ public class ServerWebSocketHandler {
             }
 
             String username = new AuthMySqlDataAccess().getUsername(command.getAuthToken());
+            if (username == null) {
+                ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+                error.setErrorMessage("Error: Invalid auth token.");
+                session.getRemote().sendString(gson.toJson(error));
+                session.close();
+                return;
+            }
             ServerMessage leaveNotice = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
             leaveNotice.setNotification(username + " has left the game.");
 
             String result = gson.toJson(leaveNotice);
+            assert sessions != null;
             for (Session s : sessions) {
                 if (s.isOpen()) {
                     try {
@@ -160,20 +203,6 @@ public class ServerWebSocketHandler {
             response.setNotification("Command received: " + command.getCommandType());
             session.getRemote().sendString(gson.toJson(response));
         }
-    }
-
-    private static ServerMessage getServerMessage(String username, GameData gameData) {
-        String joinType;
-        if (username.equals(gameData.whiteUsername())) {
-            joinType = "WHITE";
-        } else if (username.equals(gameData.blackUsername())) {
-            joinType = "BLACK";
-        } else {
-            joinType = "an observer";
-        }
-        ServerMessage joinNotice = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        joinNotice.setNotification(username + " joined the game as " + joinType);
-        return joinNotice;
     }
 
     @OnWebSocketClose
@@ -198,6 +227,78 @@ public class ServerWebSocketHandler {
                     s.getRemote().sendString(message);
                 } catch (IOException e) {
                     System.err.println("Failed to send update to session: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    private static ServerMessage getJoinNotice(String username, GameData gameData) {
+        String joinType;
+        if (username.equals(gameData.whiteUsername())) {
+            joinType = "WHITE";
+        } else if (username.equals(gameData.blackUsername())) {
+            joinType = "BLACK";
+        } else {
+            joinType = "an observer";
+        }
+        ServerMessage joinNotice = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        joinNotice.setNotification(username + " joined the game as " + joinType);
+        return joinNotice;
+    }
+
+    private String moveToString(ChessMove move) {
+        return squareToString(move.getStartPosition()) + " to " + squareToString(move.getEndPosition());
+    }
+
+    private String squareToString(ChessPosition position) {
+        char file = (char) ('a' + position.getColumn());
+        int rank = 8 - position.getRow();
+        return "" + file + (rank + 1);
+    }
+
+    private void gameNotifications(int gameID, ChessGame game) throws IOException {
+        ChessGame.TeamColor nextTurn = game.getTeamTurn();
+
+        boolean checkmate = game.isInCheckmate(nextTurn);
+        boolean stalemate = game.isInStalemate(nextTurn);
+        boolean check = game.isInCheck(nextTurn);
+
+        List<String> notifications = new ArrayList<>();
+
+        if (checkmate) {
+            notifications.add(nextTurn + " is in checkmate. Game over.");
+            endedGames.add(gameID);
+        } else if (stalemate) {
+            notifications.add("Game is a stalemate.");
+            endedGames.add(gameID);
+        } else if (check) {
+            notifications.add(nextTurn + " is in check.");
+        }
+
+        for (String note : notifications) {
+            ServerMessage status = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+            status.setNotification(note);
+            String json = gson.toJson(status);
+
+            for (Session s : gameSessions.getOrDefault(gameID, List.of())) {
+                if (s.isOpen()) {
+                    s.getRemote().sendString(json);
+                }
+            }
+        }
+    }
+
+    private void sendNotification(int gameID, String message, Session currentSession) {
+        ServerMessage msg = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        msg.setNotification(message);
+        String json = gson.toJson(msg);
+
+        for (Session s : gameSessions.getOrDefault(gameID, List.of())) {
+            if (s.isOpen() && !s.equals(currentSession)) {
+                try {
+                    s.getRemote().sendString(json);
+                } catch (IOException e) {
+                    System.err.println("Failed to send notification: " + e.getMessage());
                 }
             }
         }

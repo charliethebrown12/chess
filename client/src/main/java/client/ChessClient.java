@@ -10,6 +10,8 @@ import chess.ChessGame;
 import exception.ResponseException;
 import model.AuthData;
 import server.ServerFacade;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 public class ChessClient implements ServerMessageObserver {
     private String username = null;

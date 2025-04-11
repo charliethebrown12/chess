@@ -82,7 +82,7 @@ public class GameMySqlDataAccess implements GameAccess{
                         String chessGameJson = rs.getString("chessGame");
                         ChessGame chessGame = gson.fromJson(chessGameJson, ChessGame.class);
                         return new GameData(gameID2, whiteUserID2, blackUserID2, gameName2, chessGame);
-                    } else {throw new DataAccessException("No rows affected, game not joined");}
+                    } else {throw new DataAccessException("No players have joined this game yet: Cannot observe game.");}
 
                 } catch (SQLException e) {
                     throw new DataAccessException(e.getMessage());

@@ -30,7 +30,7 @@ public class GameService {
         String whiteUsername = game.whiteUsername();
         String blackUsername = game.blackUsername();
         if (Objects.equals(playerColor, "WHITE")) {
-            if (whiteUsername == null || whiteUsername.isEmpty()) {
+            if (whiteUsername == null || whiteUsername.isEmpty() || whiteUsername.equals(user)) {
                 GameData updateGame = new GameData(game.gameID(), user, game.blackUsername(), game.gameName(), game.game());
                 gameAccess.deleteGame(gameID);
                 gameAccess.addGame(updateGame);
@@ -39,7 +39,7 @@ public class GameService {
             }
         }
         else if (Objects.equals(playerColor, "BLACK")) {
-            if (blackUsername == null || blackUsername.isEmpty()) {
+            if (blackUsername == null || blackUsername.isEmpty() || blackUsername.equals(user)) {
                 GameData updateGame = new GameData(game.gameID(), game.whiteUsername(), user, game.gameName(), game.game());
                 gameAccess.deleteGame(gameID);
                 gameAccess.addGame(updateGame);

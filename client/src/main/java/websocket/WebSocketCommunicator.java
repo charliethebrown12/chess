@@ -1,6 +1,7 @@
 package websocket;
 
 import org.eclipse.jetty.websocket.client.WebSocketClient;
+import websocket.commands.UserGameCommand;
 
 import java.net.URI;
 

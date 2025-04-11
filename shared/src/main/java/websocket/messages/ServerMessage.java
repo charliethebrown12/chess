@@ -1,4 +1,4 @@
-package websocket;
+package websocket.messages;
 
 import chess.ChessGame;
 
@@ -13,7 +13,7 @@ import java.util.Objects;
 public class ServerMessage {
     ServerMessageType serverMessageType;
     private String errorMessage;
-    private String notification;
+    private String message;
     private ChessGame game;
 
     public enum ServerMessageType {
@@ -39,11 +39,11 @@ public class ServerMessage {
     }
 
     public String getNotification() {
-        return notification;
+        return message;
     }
 
-    public void setNotification(String notification) {
-        this.notification = notification;
+    public void setNotification(String message) {
+        this.message = message;
     }
 
     public ChessGame getGame() {
