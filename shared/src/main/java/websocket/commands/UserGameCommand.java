@@ -6,7 +6,6 @@ import java.util.Objects;
 
 /**
  * Represents a command a user can send the server over a websocket
- *
  * Note: You can add to this class, but you should not alter the existing
  * methods.
  */
@@ -55,10 +54,9 @@ public class UserGameCommand {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof UserGameCommand)) {
+        if (!(o instanceof UserGameCommand that)) {
             return false;
         }
-        UserGameCommand that = (UserGameCommand) o;
         return getCommandType() == that.getCommandType() &&
                 Objects.equals(getAuthToken(), that.getAuthToken()) &&
                 Objects.equals(getGameID(), that.getGameID());

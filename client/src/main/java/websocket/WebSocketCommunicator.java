@@ -9,18 +9,17 @@ public class WebSocketCommunicator {
 
     private final WebSocketClient client;
     private final WebSocketHandler handler;
-    private final String serverUrl;
 
     public WebSocketCommunicator(String serverUrl, ServerMessageObserver observer) {
-        this.serverUrl = serverUrl.startsWith("http")
+        String serverUrl1 = serverUrl.startsWith("http")
                 ? serverUrl.replaceFirst("http", "ws")
                 : "ws://" + serverUrl;
         this.client = new WebSocketClient();
         this.handler = new WebSocketHandler(observer);
         try {
-            System.out.println("Connecting to WebSocket: " + this.serverUrl + "/ws");
+            System.out.println("Connecting to WebSocket: " + serverUrl1 + "/ws");
             client.start();
-            client.connect(handler, new URI(this.serverUrl + "/ws")).get();
+            client.connect(handler, new URI(serverUrl1 + "/ws")).get();
             System.out.println("Connected to " + serverUrl + "/ws");
         } catch (Exception e) {
             e.printStackTrace();

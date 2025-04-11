@@ -30,8 +30,4 @@ public class GameManager {
     public void removeGame(int gameID) {
         games.remove(gameID);
     }
-
-    public boolean hasGame(int gameID) {
-        return games.containsKey(gameID);
-    }
 }
