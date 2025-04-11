@@ -2,6 +2,7 @@ package server;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import dataaccess.AuthMySqlDataAccess;
 import dataaccess.DataAccessException;
@@ -116,6 +117,27 @@ public class ServerWebSocketHandler {
             }
 
             try {
+                ChessPosition from = move.getStartPosition();
+                ChessPiece piece = game.getBoard().getPiece(from);
+
+                if (piece == null) {
+                    ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+                    error.setErrorMessage("Error: No piece at the given position.");
+                    session.getRemote().sendString(gson.toJson(error));
+                    return;
+                }
+
+                ChessGame.TeamColor team = piece.getTeamColor();
+                boolean isPlayerTurn = team == game.getTeamTurn();
+                boolean isCorrectPlayer = (team == ChessGame.TeamColor.WHITE && username.equals(gameData.whiteUsername())) ||
+                        (team == ChessGame.TeamColor.BLACK && username.equals(gameData.blackUsername()));
+
+                if (!isPlayerTurn || !isCorrectPlayer) {
+                    ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+                    error.setErrorMessage("Error: It's not your turn or you're moving your opponent's piece.");
+                    session.getRemote().sendString(gson.toJson(error));
+                    return;
+                }
                 game.makeMove(move);
                 GameManager.getInstance().updateGame(gameID, game);
                 new GameMySqlDataAccess().updateGameState(gameID, game);
@@ -138,8 +160,8 @@ public class ServerWebSocketHandler {
         else if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
             int gameID = command.getGameID();
             String authToken = command.getAuthToken();
-            GameManager.getInstance().removeGame(gameID);
 
+            GameData gameData = new GameMySqlDataAccess().joinGame(gameID);
             String username = new AuthMySqlDataAccess().getUsername(authToken);
             if (username == null) {
                 ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
@@ -148,6 +170,23 @@ public class ServerWebSocketHandler {
                 session.close();
                 return;
             }
+            boolean isPlayer = username.equals(gameData.whiteUsername()) || username.equals(gameData.blackUsername());
+            if (!isPlayer) {
+                ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+                error.setErrorMessage("Observers are not allowed to resign.");
+                session.getRemote().sendString(gson.toJson(error));
+                return;
+            }
+            if (endedGames.contains(gameID)) {
+                ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+                error.setErrorMessage("Game is already over.");
+                session.getRemote().sendString(gson.toJson(error));
+                return;
+            }
+
+            GameManager.getInstance().removeGame(gameID);
+            endedGames.add(gameID);
+
             String noticeText = username + " has resigned. Game over.";
             ServerMessage resignNotice = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
             resignNotice.setNotification(noticeText);
