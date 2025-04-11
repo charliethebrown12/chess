@@ -6,6 +6,7 @@ import model.GameData;
 import service.GamesList;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -187,6 +188,25 @@ public class GameMySqlDataAccess implements GameAccess{
             }
         } catch (SQLException e) {
             throw new DataAccessException("SQL Error: " + e.getMessage());
+        }
+    }
+
+    public void clearPlayerFromGame(int gameID, String color) throws DataAccessException {
+        String sql;
+        if (color.equalsIgnoreCase("WHITE")) {
+            sql = "UPDATE games SET whiteUserID = NULL WHERE gameID = ?";
+        } else if (color.equalsIgnoreCase("BLACK")) {
+            sql = "UPDATE games SET blackUserID = NULL WHERE gameID = ?";
+        } else {
+            throw new DataAccessException("Invalid color: " + color);
+        }
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, gameID);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to clear player from game" , e);
         }
     }
 }
