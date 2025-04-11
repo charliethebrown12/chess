@@ -13,13 +13,18 @@ public class GameplayRepl {
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")) {
-            client.printBoard();
             printPrompt();
-            result = scanner.nextLine();
+            var input = scanner.nextLine();
             if (result.equals("leave")) {
                 client.quitGame();
                 new PostLoginRepl(client).run();
                 break;
+            }
+            try {
+                result = client.eval(input);
+                System.out.println(result);
+            } catch (Exception ex) {
+                System.out.println("Error: " + ex.getMessage());
             }
         }
 

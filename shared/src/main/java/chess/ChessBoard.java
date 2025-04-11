@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 
 import static chess.ChessPiece.PieceType.*;
@@ -133,5 +134,51 @@ public class ChessBoard {
         if (move.getPromotionPiece() != null) {
             addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
         }
+    }
+
+    public void printBoard(ChessGame.TeamColor playerColor, Collection<ChessPosition> highlights, ChessPosition origin) {
+        String columns = playerColor == WHITE ? "   a  b  c  d  e  f  g  h" : "   h  g  f  e  d  c  b  a";
+        System.out.println(columns);
+
+        for (int i = 0; i < 8; i++) {
+            int row = (playerColor == WHITE) ? 7 - i : i;
+            System.out.print((8 - row) + " ");
+
+            for (int j = 0; j < 8; j++) {
+                int col = (playerColor == WHITE) ? j : 7 - j;
+                ChessPosition current = new ChessPosition(row + 1, col + 1);
+                ChessPiece piece = this.getPiece(current);
+
+                boolean isOrigin = origin != null && origin.equals(current);
+                boolean isHighlighted = highlights != null && highlights.contains(current);
+                String background = isOrigin
+                        ? "\u001B[44m"
+                        : isHighlighted
+                        ? "\u001B[43m"
+                        : ((row + col) % 2 == 0 ? "\u001B[47m" : "\u001B[100m");  // normal square
+                String pieceColor = (piece != null && piece.getTeamColor() == WHITE) ? "\u001B[37m" : "\u001B[30m";
+                String symbol = getSymbol(piece);
+                String display = symbol.equals(" ") ? "\u2003" + "  " : "\u2003" + pieceColor + symbol + "\u2003";
+
+                System.out.print(background + display + "\u001B[0m");
+            }
+
+            System.out.println(" " + (8 - row));
+        }
+
+        System.out.println(columns);
+    }
+
+    private String getSymbol(ChessPiece piece) {
+        if (piece == null) return " ";
+
+        return switch (piece.getPieceType()) {
+            case KING -> (piece.getTeamColor() == WHITE) ? "♔" : "♚";
+            case QUEEN -> (piece.getTeamColor() == WHITE) ? "♕" : "♛";
+            case ROOK -> (piece.getTeamColor() == WHITE) ? "♖" : "♜";
+            case BISHOP -> (piece.getTeamColor() == WHITE) ? "♗" : "♝";
+            case KNIGHT -> (piece.getTeamColor() == WHITE) ? "♘" : "♞";
+            case PAWN -> (piece.getTeamColor() == WHITE) ? "♙" : "♟";
+        };
     }
 }

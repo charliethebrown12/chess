@@ -11,12 +11,15 @@ public class WebSocketCommunicator {
     private final String serverUrl;
 
     public WebSocketCommunicator(String serverUrl, ServerMessageObserver observer) {
-        this.serverUrl = serverUrl;
+        this.serverUrl = serverUrl.startsWith("http")
+                ? serverUrl.replaceFirst("http", "ws")
+                : "ws://" + serverUrl;
         this.client = new WebSocketClient();
         this.handler = new WebSocketHandler(observer);
         try {
+            System.out.println("Connecting to WebSocket: " + this.serverUrl + "/ws");
             client.start();
-            client.connect(handler, new URI(serverUrl + "/ws")).get();
+            client.connect(handler, new URI(this.serverUrl + "/ws")).get();
             System.out.println("Connected to " + serverUrl + "/ws");
         } catch (Exception e) {
             e.printStackTrace();

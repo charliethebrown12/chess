@@ -2,11 +2,15 @@ package server;
 
 import dataaccess.DatabaseManager;
 import spark.*;
+import static spark.Spark.webSocket;
 
 public class Server {
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
+
+        webSocket("/ws", ServerWebSocketHandler.class);
+        System.out.println("WebSocket handler registered at /ws");
 
         Spark.staticFiles.location("web");
 

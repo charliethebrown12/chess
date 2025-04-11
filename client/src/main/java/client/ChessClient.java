@@ -1,10 +1,12 @@
 package client;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import chess.ChessMove;
+import chess.ChessBoard;
 import chess.ChessPosition;
 import websocket.*;
 import chess.ChessGame;
@@ -173,53 +175,8 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     public void printBoard() {
-        String[][] board = {
-                {"♖", "♘", "♗", "♔", "♕", "♗", "♘", "♖"},
-                {"♙", "♙", "♙", "♙", "♙", "♙", "♙", "♙"},
-                {" ", " ", " ", " ", " ", " ", " ", " "},
-                {" ", " ", " ", " ", " ", " ", " ", " "},
-                {" ", " ", " ", " ", " ", " ", " ", " "},
-                {" ", " ", " ", " ", " ", " ", " ", " "},
-                {"♟", "♟", "♟", "♟", "♟", "♟", "♟", "♟"},
-                {"♜", "♞", "♝", "♚", "♛", "♝", "♞", "♜"}
-        };
-        boolean isWhitePlayer = userColor.equals("WHITE");
-
-        String columns;
-        if (isWhitePlayer) {
-            columns = "   a  b  c  d  e  f  g  h";
-        } else {
-            columns = "   h  g  f  e  d  c  b  a";
-        }
-        System.out.println(columns);
-
-        for (int i = 0; i < 8; i++) {
-            int row;
-            if (isWhitePlayer) {
-                row = i;
-            } else {
-                row = 7 - i;
-            }
-            System.out.print((8 - row) + " ");
-
-            for (int j = 0; j < 8; j++) {
-                int col;
-                if (isWhitePlayer) {
-                    col = 7 - j;
-                } else {
-                    col = j;
-                }
-                String squareColor = ((row + col) % 2 == 0) ? "\u001B[40m" : "\u001B[100m";
-                String pieceColor = (row < 2) ? "\u001B[32m" : (row > 5) ? "\u001B[34m" : "\u001B[0m";
-                String piece = board[row][col].equals(" ") ? "\u2003" + "  " : "\u2003" + pieceColor + board[row][col] + "\u2003";
-
-                System.out.print(squareColor + piece + "\u001B[0m");
-            }
-
-            System.out.println(" " + (8 - row));
-        }
-
-        System.out.println(columns); // Column labels at the bottom
+        ChessBoard board = game.getBoard();
+        board.printBoard(ChessGame.TeamColor.valueOf(userColor), null, null);
     }
 
     public String redrawBoard() throws ResponseException {
@@ -265,13 +222,24 @@ public class ChessClient implements ServerMessageObserver {
         if (params.length != 1) {
             throw new ResponseException(400, "Expected: highlight <SQUARE>");
         }
-        String square = params[0];
-        ChessPosition position = parseSquare(square, userColor);
+
+        ChessPosition position = parseSquare(params[0], userColor);
         if (game == null) {
             return "No game state available to highlight moves";
         }
+
         var legalMoves = game.validMoves(position);
-        return "Highlighted legal moves for piece at " + square + ": " + legalMoves;
+        if (legalMoves == null || legalMoves.isEmpty()) {
+            return "No legal moves for that piece.";
+        }
+
+        Collection<ChessPosition> destinations = legalMoves.stream()
+                .map(ChessMove::getEndPosition)
+                .toList();
+
+        game.getBoard().printBoard(ChessGame.TeamColor.valueOf(userColor), destinations, position);
+
+        return "Highlighted legal moves for piece at " + params[0] + ".";
     }
 
     public String help() {
@@ -326,8 +294,8 @@ public class ChessClient implements ServerMessageObserver {
     public boolean isInGame() { return state == State.INGAME; }
 
     private ChessPosition parseSquare(String notation, String userColor) {
-        int col = notation.charAt(0) - 'a';
-        int row = 8 - Character.getNumericValue(notation.charAt(1));
+        int col = notation.charAt(0) - 'a' + 1;
+        int row = 8 - Character.getNumericValue(notation.charAt(1)) + 1;
         return new ChessPosition(row, col);
     }
 
@@ -336,6 +304,7 @@ public class ChessClient implements ServerMessageObserver {
         switch (message.getServerMessageType()) {
             case LOAD_GAME -> {
                 this.game = message.getGame();
+                System.out.println("\nGame updated: ");
                 printBoard();
             }
             case ERROR -> System.out.println("Error from server: " + message.getErrorMessage());
