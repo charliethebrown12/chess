@@ -41,6 +41,18 @@ public class ServerWebSocketHandler {
             int gameID = command.getGameID();
             try {
                 GameData gameData = new GameMySqlDataAccess().joinGame(gameID);
+                String username = new AuthMySqlDataAccess().getUsername(command.getAuthToken());
+
+                ServerMessage joinNotice = getServerMessage(username, gameData);
+
+                String notice = gson.toJson(joinNotice);
+
+                List<Session> sessions = gameSessions.getOrDefault(gameID, List.of());
+                for (Session s : sessions) {
+                    if (!s.equals(session) && s.isOpen()) { // send to everyone else
+                        s.getRemote().sendString(notice);
+                    }
+                }
                 ChessGame game = gameData.game();
 
                 GameManager.getInstance().updateGame(gameID, game);
@@ -148,6 +160,20 @@ public class ServerWebSocketHandler {
             response.setNotification("Command received: " + command.getCommandType());
             session.getRemote().sendString(gson.toJson(response));
         }
+    }
+
+    private static ServerMessage getServerMessage(String username, GameData gameData) {
+        String joinType;
+        if (username.equals(gameData.whiteUsername())) {
+            joinType = "WHITE";
+        } else if (username.equals(gameData.blackUsername())) {
+            joinType = "BLACK";
+        } else {
+            joinType = "an observer";
+        }
+        ServerMessage joinNotice = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        joinNotice.setNotification(username + " joined the game as " + joinType);
+        return joinNotice;
     }
 
     @OnWebSocketClose
