@@ -2,6 +2,7 @@ package server;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import dataaccess.AuthMySqlDataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.GameMySqlDataAccess;
 import model.GameData;
@@ -31,7 +32,7 @@ public class ServerWebSocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException {
+    public void onMessage(Session session, String message) throws IOException, DataAccessException {
         System.out.println("Server: Message received - " + message);
         UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
 
@@ -59,7 +60,16 @@ public class ServerWebSocketHandler {
             }
         }
         else if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE) {
+            String username = new AuthMySqlDataAccess().getUsername(command.getAuthToken());
             int gameID = command.getGameID();
+            GameData gameData = new GameMySqlDataAccess().joinGame(gameID);
+            boolean isPlayer = username.equals(gameData.whiteUsername()) || username.equals(gameData.blackUsername());
+            if (!isPlayer) {
+                ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+                error.setErrorMessage("Observers are not allowed to make moves.");
+                session.getRemote().sendString(gson.toJson(error));
+                return;
+            }
             ChessMove move = command.getMove();
 
             ChessGame game = GameManager.getInstance().getGame(gameID);
@@ -82,6 +92,55 @@ public class ServerWebSocketHandler {
                 ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
                 error.setErrorMessage("Invalid move: " + e.getMessage());
                 session.getRemote().sendString(gson.toJson(error));
+            }
+        }
+        else if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
+            int gameID = command.getGameID();
+            String authToken = command.getAuthToken();
+            GameManager.getInstance().removeGame(gameID); // if you're done with the game
+
+            // Notify all players
+            String username = new AuthMySqlDataAccess().getUsername(authToken);
+            String noticeText = username + " has resigned. Game over.";
+            ServerMessage resignNotice = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+            resignNotice.setNotification(noticeText);
+
+            String result = gson.toJson(resignNotice);
+            List<Session> sessions = gameSessions.getOrDefault(gameID, List.of());
+            for (Session s : sessions) {
+                if (s.isOpen()) {
+                    try {
+                        s.getRemote().sendString(result);
+                    } catch (IOException e) {
+                        System.err.println("Failed to notify session: " + e.getMessage());
+                    }
+                }
+            }
+
+            System.out.println("Player resigned from game " + gameID);
+        }
+        else if (command.getCommandType() == UserGameCommand.CommandType.LEAVE) {
+            int gameID = command.getGameID();
+
+            List<Session> sessions = gameSessions.get(gameID);
+            if (sessions != null) {
+                sessions.removeIf(s -> s.equals(session));
+                System.out.println("Player left game " + gameID);
+            }
+
+            String username = new AuthMySqlDataAccess().getUsername(command.getAuthToken());
+            ServerMessage leaveNotice = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+            leaveNotice.setNotification(username + " has left the game.");
+
+            String result = gson.toJson(leaveNotice);
+            for (Session s : sessions) {
+                if (s.isOpen()) {
+                    try {
+                        s.getRemote().sendString(result);
+                    } catch (IOException e) {
+                        System.err.println("Failed to send leave notification: " + e.getMessage());
+                    }
+                }
             }
         }
         else {

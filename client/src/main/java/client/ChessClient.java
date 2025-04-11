@@ -1,9 +1,6 @@
 package client;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import chess.ChessMove;
 import chess.ChessBoard;
@@ -211,6 +208,13 @@ public class ChessClient implements ServerMessageObserver {
 
     public String resignGame() throws ResponseException {
         assertInGame();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Are you sure you want to resign? (y/n): ");
+        String answer = scanner.nextLine().trim().toLowerCase();
+
+        if (!answer.equals("y")) {
+            return "Resignation canceled.";
+        }
         UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authData.authToken(), gameID);
         websocket.send(resign);
         state = State.SIGNEDIN;
