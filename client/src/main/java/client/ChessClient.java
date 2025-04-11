@@ -303,6 +303,7 @@ public class ChessClient implements ServerMessageObserver {
     public void notify(ServerMessage message) {
         switch (message.getServerMessageType()) {
             case LOAD_GAME -> {
+                System.out.println("Client received LOAD_GAME");
                 this.game = message.getGame();
                 System.out.println("\nGame updated: ");
                 printBoard();

@@ -172,4 +172,21 @@ public class GameMySqlDataAccess implements GameAccess{
             System.err.println("Failed to create tables: " + e.getMessage());
         }
     }
+
+    public void updateGameState(int gameID, ChessGame game) throws DataAccessException {
+        String statement = "UPDATE games SET chessGame = ? WHERE gameID = ?";
+        try (var conn = DatabaseManager.getConnection();
+             var preparedStatement = conn.prepareStatement(statement)) {
+            String gameJson = new Gson().toJson(game);
+            preparedStatement.setString(1, gameJson);
+            preparedStatement.setInt(2, gameID);
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new DataAccessException("Failed to update game state in DB");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("SQL Error: " + e.getMessage());
+        }
+    }
 }

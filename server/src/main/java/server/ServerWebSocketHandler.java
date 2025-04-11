@@ -39,11 +39,13 @@ public class ServerWebSocketHandler {
             gameSessions.computeIfAbsent(command.getGameID(), id -> new ArrayList<>()).add(session);
             int gameID = command.getGameID();
             try {
-                GameMySqlDataAccess gameAccess = new GameMySqlDataAccess();
-                GameData gameData = gameAccess.joinGame(gameID);
+                GameData gameData = new GameMySqlDataAccess().joinGame(gameID);
                 ChessGame game = gameData.game();
 
+                GameManager.getInstance().updateGame(gameID, game);
+
                 ServerMessage response = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+                System.out.println("Sending LOAD_GAME for gameID: " + gameID);
                 response.setGame(game);
 
                 session.getRemote().sendString(gson.toJson(response));
@@ -68,6 +70,8 @@ public class ServerWebSocketHandler {
 
             try {
                 game.makeMove(move);
+                GameManager.getInstance().updateGame(gameID, game);
+                new GameMySqlDataAccess().updateGameState(gameID, game);
                 System.out.println("Move applied: " + move);
 
 
