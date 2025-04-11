@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import dataaccess.AuthMySqlDataAccess;
 import dataaccess.GameMySqlDataAccess;
 import model.ErrorData;
+import model.GameData;
 import model.JoinGameRequest;
 import service.AuthService;
+import service.GameManager;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -26,6 +28,8 @@ public class JoinGameHandler {
             }
             String user = authService.getUser(authToken);
             gameService.joinGame(joinRequest.gameID(), joinRequest.playerColor(), user);
+            GameData gameData = new GameMySqlDataAccess().joinGame(joinRequest.gameID());
+            GameManager.getInstance().updateGame(joinRequest.gameID(), gameData.game());
             return new Gson().toJson(new Object());
 
         } catch (Exception e) {
