@@ -1,25 +1,29 @@
 package websocket;
 
-import org.eclipse.jetty.websocket.client.WebSocketClient;
-import websocket.commands.UserGameCommand;
-
+import com.google.gson.Gson;
+import javax.websocket.ContainerProvider;
+import javax.websocket.WebSocketContainer;
 import java.net.URI;
+import java.util.concurrent.CountDownLatch;
+import websocket.commands.UserGameCommand;
 
 public class WebSocketCommunicator {
 
-    private final WebSocketClient client;
     private final WebSocketHandler handler;
 
     public WebSocketCommunicator(String serverUrl, ServerMessageObserver observer) {
         String serverUrl1 = serverUrl.startsWith("http")
                 ? serverUrl.replaceFirst("http", "ws")
                 : "ws://" + serverUrl;
-        this.client = new WebSocketClient();
-        this.handler = new WebSocketHandler(observer);
+
+        CountDownLatch connectLatch = new CountDownLatch(1);
+        this.handler = new WebSocketHandler(observer, connectLatch);
+        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+
         try {
             System.out.println("Connecting to WebSocket: " + serverUrl1 + "/ws");
-            client.start();
-            client.connect(handler, new URI(serverUrl1 + "/ws")).get();
+            container.connectToServer(handler, new URI(serverUrl1 + "/ws"));
+            connectLatch.await();
             System.out.println("Connected to " + serverUrl + "/ws");
         } catch (Exception e) {
             e.printStackTrace();
@@ -31,13 +35,7 @@ public class WebSocketCommunicator {
     }
 
     public void close() {
-        try {
-            if (client != null && client.isStarted()) {
-                client.stop();
-                System.out.println("WebSocket connection closed.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Note: Tyrus handles closing connections via the Session close.
+        System.out.println("WebSocket connection closed.");
     }
 }

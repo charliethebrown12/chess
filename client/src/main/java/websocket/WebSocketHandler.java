@@ -1,52 +1,53 @@
 package websocket;
 
 import com.google.gson.Gson;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.*;
+import javax.websocket.Session;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
+import javax.websocket.*;
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
-
-@WebSocket
+@ClientEndpoint
 public class WebSocketHandler {
-
     private final Gson gson = new Gson();
     private Session session;
     private final ServerMessageObserver observer;
+    private final CountDownLatch connectLatch;
 
-    public WebSocketHandler(ServerMessageObserver observer) {
+    public WebSocketHandler(ServerMessageObserver observer, CountDownLatch connectLatch) {
         this.observer = observer;
+        this.connectLatch = connectLatch;
     }
 
-    @OnWebSocketConnect
-    public void onConnect(Session session) {
+    @OnOpen
+    public void onOpen(Session session) {
         this.session = session;
         System.out.println("WebSocket connection opened: " + session);
+        connectLatch.countDown();
     }
 
-    @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException {
+    @OnMessage
+    public void onMessage(String message) {
         ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
         observer.notify(serverMessage);
-        }
-
-    @OnWebSocketClose
-    public void onClose(int statusCode, String reason) {
-        System.out.println("WebSocket connection closed. Code: " + statusCode + ", Reason: " + reason);
     }
 
-    @OnWebSocketError
+    @OnClose
+    public void onClose(Session session, CloseReason closeReason) {
+        System.out.println("WebSocket connection closed. Reason: " + closeReason);
+    }
+
+    @OnError
     public void onError(Session session, Throwable error) {
         System.err.println("WebSocket error: " + error.getMessage());
     }
 
     public void send(UserGameCommand command) {
         if (session != null && session.isOpen()) {
-            String json = gson.toJson(command);
             try {
-                session.getRemote().sendString(json);
+                session.getBasicRemote().sendText(gson.toJson(command));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -54,4 +55,4 @@ public class WebSocketHandler {
             System.err.println("Cannot send message, session is not open.");
         }
     }
-    }
+}
